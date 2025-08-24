@@ -1,0 +1,174 @@
+/**
+ * ===================================================================
+ * VARIABEL GLOBAL
+ * ===================================================================
+ */
+// Variabel untuk fitur Berita
+let newsLoaded = false;
+const NEWS_API_KEY = '2fa4ed0c83bf408882b74546d0f39829'; // API Key Berita Anda
+// Variabel untuk Clerk Authentication
+const CLERK_PUBLISHABLE_KEY = "pk_test_Y29tcG9zZWQtZ3JpZmZvbi00My5jbGVyay5hY2NvdW50cy5kZXYk";
+/**
+ * ===================================================================
+ * FUNGSI-FUNGSI UNTUK FITUR GEMINI AI
+ * ===================================================================
+ */
+// --- FUNGSI UNTUK MEMANGGIL GEMINI API ---
+async function callGeminiAPI(prompt) {
+    // Fungsi retry ini akan mencoba ulang jika panggilan API gagal
+    return retryWithExponentialBackoff(async () => {
+        const apiKey = "AIzaSyAJR1vJIfEDAKIY42ZbWb3qNcVwiATWxdY"; // API Key Gemini Anda
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+        const payload = {
+            contents: [{
+                parts: [{
+                    text: prompt
+                }]
+            }]
+        };
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("API Error Response:", errorData);
+            throw new Error(`API request failed: ${errorData.error?.message || response.status}`);
+        }
+        const result = await response.json();
+        if (result.candidates && result.candidates[0].content?.parts[0]?.text) {
+            return result.candidates[0].content.parts[0].text;
+        } else {
+            if (result.candidates && result.candidates[0].finishReason) {
+                throw new Error(`Permintaan AI dihentikan: ${result.candidates[0].finishReason}`);
+            }
+            console.error("Invalid API Response Structure:", result);
+            throw new Error("Gagal memproses respons dari AI. Struktur tidak valid.");
+        }
+    });
+}
+// --- FUNGSI BANTUAN UNTUK RETRY API CALL ---
+async function retryWithExponentialBackoff(func, maxRetries = 3, initialDelay = 1000) {
+    let delay = initialDelay;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await func();
+        } catch (error) {
+            console.error(`Attempt ${i + 1} failed. Retrying in ${delay}ms...`, error);
+            if (i === maxRetries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay *= 2;
+        }
+    }
+}
+// --- FUNGSI OTAK AI ---
+async function getAiPlannerResponse(destination, duration, interests) {
+    const interestsText = interests.length > 0 ? `dengan minat khusus pada ${interests.join(', ')}` : 'yang seimbang antara wisata alam, budaya, dan kuliner';
+    const prompt = `Buatkan rencana perjalanan (itinerary) yang detail dan menarik selama ${duration} hari di kota ${destination}, Indonesia. Rencana ini ditujukan untuk turis domestik. Gunakan heading <h4> untuk setiap hari (contoh: <h4>Hari 1: Petualangan Dimulai</h4>). Untuk setiap hari, berikan rekomendasi aktivitas pagi, siang, dan malam dalam bentuk daftar poin (<ul> dan <li>). Sertakan juga rekomendasi kuliner khas yang wajib dicoba di kota tersebut. Buat itinerary ini ${interestsText}. Berikan jawaban dalam Bahasa Indonesia.`;
+    return await callGeminiAPI(prompt);
+}
+async function getTravelAiAssistantResponse(type, query) {
+    const prompt = `Anda adalah asisten travel untuk aplikasi A-GIN TRAVEL. Jawab pertanyaan pengguna secara singkat dan jelas (maksimal 2-3 kalimat) dalam Bahasa Indonesia. Konteks pertanyaan adalah tentang perjalanan menggunakan ${type}. Pertanyaan pengguna: "${query}"`;
+    return await callGeminiAPI(prompt);
+}
+async function getTranslation(text, language) {
+    const prompt = `Terjemahkan teks berikut ke dalam bahasa ${language}: "${text}"`;
+    return await callGeminiAPI(prompt);
+}
+/**
+ * ===================================================================
+ * FUNGSI UNTUK FITUR BERITA
+ * ===================================================================
+ */
+async function loadTravelNews() {
+    const newsContainer = document.getElementById('news-container');
+    if (!newsContainer) return;
+    newsContainer.innerHTML = '<p class="text-center text-gray-500 mt-8">Memuat berita terkini...</p>';
+    const keywords = '"kereta api" OR "maskapai penerbangan" OR "kapal laut" OR "wisata indonesia" OR "bandara" OR "kapal PELNI" OR "Dharma Lautan Utama"';
+    const apiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(keywords)}&language=id&sortBy=publishedAt&pageSize=20&apiKey=${NEWS_API_KEY}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.status === 'ok' && data.articles.length > 0) {
+            newsContainer.innerHTML = '';
+            data.articles.forEach(article => {
+                const imageUrl = article.urlToImage ? article.urlToImage : 'https://via.placeholder.com/400x200.png?text=A-GIN+Travel';
+                const newsCard = `
+                    <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 mb-4">
+                        <img src="${imageUrl}" alt="${article.title}" class="w-full h-40 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg text-gray-900 mb-2 leading-tight">${article.title}</h3>
+                            <p class="text-sm text-gray-600 mb-3">${article.description || 'Klik untuk membaca selengkapnya.'}</p>
+                            <div class="flex justify-between items-center text-xs text-gray-500">
+                                <span class="font-semibold">${article.source.name}</span>
+                                <span>${new Date(article.publishedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+                newsContainer.innerHTML += newsCard;
+            });
+        } else {
+            newsContainer.innerHTML = `<p class="text-center text-red-500 mt-8">Saat ini tidak ada berita yang ditemukan. Coba lagi nanti.</p>`;
+        }
+    } catch (error) {
+        console.error('Gagal mengambil berita:', error);
+        newsContainer.innerHTML = `<p class="text-center text-red-500 mt-8">Gagal memuat berita. Periksa koneksi internet atau konfigurasi API Anda.<br><small class="text-xs">${error.message}</small></p>`;
+    }
+}
+
+window.addEventListener('load', () => {
+    const splash = document.getElementById('splash-screen');
+    setTimeout(() => {
+        if (splash) {
+            splash.classList.add('hidden');
+        }
+    }, 2500); // 2.5 detik
+});
+// Memuat Clerk.js secara dinamis
+const clerkScript = document.createElement('script');
+clerkScript.setAttribute('data-clerk-publishable-key', CLERK_PUBLISHABLE_KEY);
+clerkScript.async = true;
+clerkScript.src = `https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js`;
+clerkScript.crossOrigin = "anonymous";
+document.head.appendChild(clerkScript);
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- SETUP UNTUK FITUR CHAT ---
+    const sendButton = document.getElementById('send-button');
+    const messageInput = document.getElementById('chat-input');
+    const chatTabButton = document.getElementById('chat-tab-button'); // GANTI DENGAN ID TOMBOL TAB CHAT ANDA
+    if (sendButton && messageInput) {
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Mencegah baris baru di input
+                sendMessage();
+            }
+        });
+    }
+    // Panggil startChat() saat pengguna mengklik tab chat
+    if (chatTabButton) {
+        chatTabButton.addEventListener('click', () => {
+            // Cek jika Clerk sudah siap dan user sudah login
+            if (window.Clerk && window.Clerk.user) {
+                const userId = window.Clerk.user.id;
+                // Cek agar tidak memulai koneksi berulang kali
+                if (!sb || sb.connectionState !== 'OPEN') {
+                    startChat(userId);
+                }
+            } else {
+                console.log("Menunggu Clerk siap atau pengguna login...");
+                // Anda mungkin perlu menampilkan pesan untuk login terlebih dahulu
+            }
+        });
+    }
+});
