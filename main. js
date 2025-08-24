@@ -1,0 +1,1268 @@
+
+const DB = {
+    airlines: ["Airfast Indonesia", "Batik Air", "Citilink", "Garuda Indonesia", "Indonesia AirAsia", "Lion Air", "NAM Air", "Pelita Air", "Sriwijaya Air", "Super Air Jet", "Susi Air", "TransNusa", "Trigana Air", "Wings Air"],
+    airports: ["A. A. Bere Tallo (ABU), Atambua", "Adisumarmo (SOC), Solo", "Adisutjipto (JOG), Yogyakarta", "Aji Pangeran Tumenggung Pranoto (AAP), Samarinda", "Blimbingsari (BWX), Banyuwangi", "Depati Amir (PGK), Pangkal Pinang", "Domine Eduard Osok (SOQ), Sorong", "El Tari (KOE), Kupang", "Fatmawati Soekarno (BKS), Bengkulu", "Frans Kaisiepo (BIK), Biak", "Frans Seda (MOF), Maumere", "H. Hasan Aroeboesman (ENE), Ende", "Halim Perdanakusuma (HLP), Jakarta", "Haluoleo (KDI), Kendari", "Hang Nadim (BTH), Batam", "Hasanuddin (UPG), Makassar", "Husein Sastranegara (BDO), Bandung", "Jenderal Ahmad Yani (SRG), Semarang", "Juanda (SUB), Surabaya", "Juwata (TRK), Tarakan", "Kalimarau (BEJ), Berau (Derawan)", "Kertajati (KJT), Majalengka", "Komodo (LBJ), Labuan Bajo", "Kualanamu (KNO), Medan", "Lombok Praya (LOP), Lombok", "Luwuk (LUW), LuWuk", "Malikus Saleh (LSW), Lhokseumawe", "Matahora (WNI), Wangi-wangi (Wakatobi)", "Mathilda Batlayeri (SXK), Saumlaki", "Minangkabau (PDG), Padang", "Mozes Kilangin (TIM), Timika", "Mutiara SIS Al-Jufri (PLW), Palu", "Ngurah Rai (DPS), Denpasar", "Pattimura (AMQ), Ambon", "Pinangsori (FLZ), Sibolga", "Radin Inten II (TKG), Lampung", "Raja Haji Fisabilillah (TNJ), Tanjung Pinang", "Rendani (MKW), Manokwari", "Sam Ratulangi (MDC), Manado", "Sentani (DJJ), Jayapura", "Silangit (DTB), Siborong-borong (Danau Toba)", "Soekarno-Hatta (CGK), Jakarta", "Sultan Aji Muhammad Sulaiman (BPN), Balikpapan", "Sultan Babullah (TTE), Ternate", "Sultan Iskandar Muda (BTJ), Banda Aceh", "Sultan Mahmud Badaruddin II (PLM), Palembang", "Sultan Syarif Kasim II (PKU), Pekanbaru", "Sultan Thaha (DJB), Jambi", "Supadio (PNK), Pontianak", "Syamsudin Noor (BDJ), Banjarmasin", "Tambolaka (TMC), Sumba", "Tjilik Riwut (PKY), Palangkaraya", "Yogyakarta International Airport (YIA), Yogyakarta"],
+    pelniShips: ["KM Awu", "KM Binaiya", "KM Bukit Raya", "KM Bukit Siguntang", "KM Ciremai", "KM Dobonsolo", "KM Dorolonda", "KM Egon", "KM Ganda Dewata", "KM Gunung Dempo", "KM Kelimutu", "KM Kelud", "KM Lambelu", "KM Lawit", "KM Leuser", "KM Nggapulu", "KM Pangrango", "KM Sabuk Nusantara (Series)", "KM Sangiang", "KM Sinabung", "KM Sirimau", "KM Tatamailau", "KM Tidar", "KM Tilongkabila", "KM Umsini"],
+    dluFerries: ["KMP. Dharma Kencana V", "KMP. Dharma Kencana VII", "KMP. Dharma Rucitra VII", "KMP. Dharma Rucitra VIII", "KMP. Dharma Rucitra IX", "KMP. Dharma Kartika V", "KMP. Dharma Kartika VII", "KMP. Kirana I", "KMP. Kirana VII", "KMP. Kirana IX", "KMP. Satya Kencana III", "KMP. Satya Kencana V", "KMP. Kumala", "KMP. Dharma Fery II", "KMP. Dharma Fery V", "KMP. Mutis", "KMP. Niki Sejahtera", "KMP. Plఎస్‌bu I"],
+    seaPorts: ["Bakauheni, Lampung", "Batam Centre, Batam", "Belawan, Medan", "Benoa Harbour, Bali", "Dwikora, Pontianak", "Gilimanuk, Bali", "Harbour Bay, Batam", "Kayangan, Lombok", "Ketapang, Banyuwangi", "Lembar, Lombok", "Merak, Banten", "Port of Ambon, Ambon", "Port of Balikpapan (Semayang), Balikpapan", "Port of Banjarmasin (Trisakti), Banjarmasin", "Port of Batulicin, Tanah Bumbu", "Port of Bau-Bau, Bau-Bau", "Port of Biak, Biak", "Port of Bima, Bima", "Port of Bitung, Bitung", "Port of Dumai, Dumai", "Port of Ende, Ende", "Port of Fakfak, Fakfak", "Port of Jayapura, Jayapura", "Port of Kendari, Kendari", "Port of Kumai, Pangkalan Bun", "Port of Kupang (Tenau), Kupang", "Port of Labuan Bajo, Labuan Bajo", "Port of Makassar (Soekarno-Hatta), Makassar", "Port of Manokwari, Manokwari", "Port of Maumere (Laurentius Say), Maumere", "Port of Sampit, Sampit", "Port of Saumlaki, Saumlaki", "Port of Sorong, Sorong", "Port of Ternate, Ternate", "Port of Tual, Tual", "Port of Waingapu, Sumba", "Sekupang, Batam", "Tanjung Balai, Asahan", "Tanjung Balai Karimun, Karimun", "Tanjung Emas, Semarang", "Tanjung Gudang, Bangka Belitung", "Tanjung Perak, Surabaya", "Tanjung Priok, Jakarta", "Tanjung Pinang, Bintan", "Tanjung Wangi, Banyuwangi", "Teluk Bayur, Padang"],
+    dluPorts: ["Surabaya (Tanjung Perak)", "Jakarta (Tanjung Priok)", "Semarang (Tanjung Emas)", "Banjarmasin (Trisakti)", "Balikpapan (Semayang)", "Makassar (Soekarno-Hatta)", "Pontianak (Dwikora)", "Sampit", "Kumai (Pangkalan Bun)", "Batulicin", "Lembar (Lombok)", "Labuan Bajo", "Maumere (Laurentius Say)", "Ende", "Kupang (Tenau)", "Waingapu (Sumba)"],
+    busOperators: ["ALS (Antar Lintas Sumatera)", "ANS (Anas Nasional Sejahtera)", "Budiman", "DAMRI", "Efisiensi", "Eka & Mira", "Gunung Harta", "Handoyo", "Harapan Jaya", "Haryanto", "Karina", "Kramat Djati", "Kurnia", "Laju Prima", "Lorena", "Majoe Group", "Medan Jaya", "MGI (Maya Gapura Intan)", "NPM", "Nusantara", "Pahala Kencana", "Putra Pelangi", "Putra Remaja", "Raya", "Rosalia Indah", "SAN (Siliwi Antar Nusa)", "Sempati Star", "Shantika", "Sinar Jaya", "Sugeng Rahayu (Sumber Group)", "Sumber Alam"],
+    busTerminals: ["Terminal Alang-Alang Lebar, Palembang", "Terminal Amplas, Medan", "Terminal Arjosari, Malang", "Terminal Baranangsiang, Bogor", "Terminal Bawen, Semarang", "Terminal Bulupitu, Purwokerto", "Terminal Cicaheum, Bandung", "Terminal Ciledug, Cirebon", "Terminal Dhaksinarga, Wonosari", "Terminal Giwangan, Yogyakarta", "Terminal Indihiang, Tasikmalaya", "Terminal Ir. Soekarno, Klaten", "Terminal Jatijajar, Depok", "Terminal Kalideres, Jakarta", "Terminal Kampung Rambutan, Jakarta", "Terminal Kertonegoro, Ngawi", "Terminal Leuwipanjang, Bandung", "Terminal Mengwi, Bali", "Terminal Pakupatan, Serang", "Terminal Patria, Blitar", "Terminal Poris Plawad, Tangerang", "Terminal Pulo Gebang, Jakarta", "Terminal Purabaya (Bungurasih), Surabaya", "Terminal Purboyo, Madiun", "Terminal Rajabasa, Bandar Lampung", "Terminal Tamanan, Kediri", "Terminal Tawang Alun, Jember", "Terminal Tegal, Tegal", "Terminal Tirtonadi, Solo"],
+    trainStations: ["Bandung (BD)", "Banjar (BJR)", "Blitar (BL)", "Cikampek (CKP)", "Cirebon (CN)", "Cirebon Prujakan (CNP)", "Gambir (GMR), Jakarta", "Jakarta Kota (JAKK)", "Jember (JR)", "Jombang (JG)", "Kediri (KD)", "Kertosono (KTS)", "Kroya (KYA)", "Kutoarjo (KTA)", "Lempuyangan (LPN), Yogyakarta", "Madiun (MN)", "Malang (ML)", "Manggarai (MRI), Jakarta", "Medan (MDN)", "Pasar Senen (PSE), Jakarta", "Pekalongan (PK)", "Purwokerto (PWT)", "Purwosari (PWS), Solo", "Rantau Prapat (RAP), Labuhanbatu", "Semarang Poncol (SMC)", "Semarang Tawang (SMT)", "Solo Balapan (SLO)", "Surabaya Gubeng (SGU)", "Surabaya Pasar Turi (SBI)", "Tanah Abang (THB), Jakarta", "Tanjungkarang (TNK), Bandar Lampung", "Tegal (TG)", "Yogyakarta (YK)"],
+    hotelLocations: ["Anyer", "Bali (Canggu)", "Bali (Denpasar)", "Bali (Jimbaran)", "Bali (Kuta)", "Bali (Legian)", "Bali (Nusa Dua)", "Bali (Sanur)", "Bali (Seminyak)", "Bali (Ubud)", "Balikpapan", "Banda Aceh", "Bandar Lampung", "Bandung", "Banjarmasin", "Banyuwangi", "Batam", "Batu", "Bintan", "Bogor", "Bromo", "Bukittinggi", "Cianjur", "Cirebon", "Ciwidey", "Danau Toba", "Dieng (Wonosobo)", "Garut", "Gili Trawangan", "Jakarta", "Jember", "Karimunjawa", "Kepulauan Seribu", "Labuan Bajo", "Lembang", "Lombok", "Makassar", "Malang", "Manado", "Medan", "Nusa Lembongan", "Nusa Penida", "Padang", "Palembang", "Pangandaran", "Pekanbaru", "Pontianak", "Puncak", "Purwokerto", "Raja Ampat (Sorong/Waisai)", "Salatiga", "Samarinda", "Semarang", "Sentul", "Solo", "Sukabumi", "Surabaya", "Tangerang", "Yogyakarta"],
+    banks: ["BCA", "Mandiri", "BNI", "BRI", "CIMB Niaga", "Danamon", "Bank Syariah Indonesia (BSI)", "Bank Jago", "SeaBank"]
+};
+let passengerCounts = { adult: 1, child: 0, infant: 0 };
+let hotelGuestCounts = { adult: 1, child: 0, room: 1 };
+let activeBookingData = {};
+let navigationStack = [];
+let tempPassengerCounts = { ...passengerCounts };
+let tempHotelGuestCounts = { ...hotelGuestCounts };
+
+// --- FUNGSI-FUNGSI UNTUK FITUR GEMINI AI ---
+async function callGeminiAPI(prompt) {
+    return retryWithExponentialBackoff(async () => {
+        const apiKey = "AIzaSyAJR1vJIfEDAKIY42ZbWb3qNcVwiATWxdY"; // GANTI DENGAN API KEY GEMINI ANDA
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }]
+        };
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("API Error Response:", errorData);
+            throw new Error(`API request failed: ${errorData.error?.message || response.status}`);
+        }
+        const result = await response.json();
+        if (result.candidates && result.candidates[0].content?.parts[0]?.text) {
+            return result.candidates[0].content.parts[0].text;
+        } else {
+            if (result.candidates && result.candidates[0].finishReason) {
+                throw new Error(`Permintaan AI dihentikan: ${result.candidates[0].finishReason}`);
+            }
+            console.error("Invalid API Response Structure:", result);
+            throw new Error("Gagal memproses respons dari AI. Struktur tidak valid.");
+        }
+    });
+}
+async function retryWithExponentialBackoff(func, maxRetries = 3, initialDelay = 1000) {
+    let delay = initialDelay;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await func();
+        } catch (error) {
+            console.error(`Attempt ${i + 1} failed. Retrying in ${delay}ms...`, error);
+            if (i === maxRetries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay *= 2;
+        }
+    }
+}
+async function getAiPlannerResponse(destination, duration, interests) {
+    const interestsText = interests.length > 0 ? `dengan minat khusus pada ${interests.join(', ')}` : 'yang seimbang antara wisata alam, budaya, dan kuliner';
+    const prompt = `Buatkan rencana perjalanan (itinerary) yang detail dan menarik selama ${duration} hari di kota ${destination}, Indonesia. Rencana ini ditujukan untuk turis domestik. Gunakan heading <h4> untuk setiap hari (contoh: <h4>Hari 1: Petualangan Dimulai</h4>). Untuk setiap hari, berikan rekomendasi aktivitas pagi, siang, dan malam dalam bentuk daftar poin (<ul> dan <li>). Sertakan juga rekomendasi kuliner khas yang wajib dicoba di kota tersebut. Buat itinerary ini ${interestsText}. Berikan jawaban dalam Bahasa Indonesia.`;
+    return await callGeminiAPI(prompt);
+}
+async function getTranslation(text, language) {
+    const prompt = `Terjemahkan teks berikut ke dalam bahasa ${language}: "${text}"`;
+    return await callGeminiAPI(prompt);
+}
+
+// --- SISTEM LOADING & NOTIFIKASI ---
+function showLoading(message = 'Memproses...') {
+    const overlay = document.getElementById('loadingOverlay');
+    const text = document.getElementById('loadingText');
+    if (overlay && text) {
+        text.textContent = message;
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+    }
+}
+function hideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.style.display = 'none', 300);
+    }
+}
+function showNotification(message) {
+    const toast = document.createElement('div');
+    toast.className = 'notification-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// --- MANAJEMEN MODAL ---
+function createPassengerModals() {
+    if (document.getElementById('passengerModal')) return;
+    const passengerModalHTML = `<div id="passengerModal" class="modal-wrapper hidden"><div class="modal-overlay" onclick="closeModal('passengerModal')"></div><div class="modal-content"><div class="modal-header"><h3 class="text-lg font-bold">Pilih Penumpang</h3><button class="modal-close-btn" onclick="closeModal('passengerModal')"><i class="fas fa-times"></i></button></div><div class="modal-body space-y-4"><div class="flex justify-between items-center"><div><p class="font-semibold">Dewasa</p><p class="text-xs text-muted">(Diatas 12 tahun)</p></div><div class="flex items-center gap-3"><button class="counter-btn" onclick="updatePassengerCount('passenger', -1, 'adult')">-</button><span id="adult-count" class="counter-value">1</span><button class="counter-btn" onclick="updatePassengerCount('passenger', 1, 'adult')">+</button></div></div><div class="flex justify-between items-center"><div><p class="font-semibold">Anak</p><p class="text-xs text-muted">(2 - 12 tahun)</p></div><div class="flex items-center gap-3"><button class="counter-btn" onclick="updatePassengerCount('passenger', -1, 'child')">-</button><span id="child-count" class="counter-value">0</span><button class="counter-btn" onclick="updatePassengerCount('passenger', 1, 'child')">+</button></div></div><div class="flex justify-between items-center"><div><p class="font-semibold">Bayi</p><p class="text-xs text-muted">(Dibawah 2 tahun)</p></div><div class="flex items-center gap-3"><button class="counter-btn" onclick="updatePassengerCount('passenger', -1, 'infant')">-</button><span id="infant-count" class="counter-value">0</span><button class="counter-btn" onclick="updatePassengerCount('passenger', 1, 'infant')">+</button></div></div></div><div class="modal-footer"><button class="btn-primary w-full" onclick="savePassengerSelection('passenger')">Simpan</button></div></div></div>`;
+    const hotelGuestModalHTML = `<div id="hotelGuestModal" class="modal-wrapper hidden"><div class="modal-overlay" onclick="closeModal('hotelGuestModal')"></div><div class="modal-content"><div class="modal-header"><h3 class="text-lg font-bold">Pilih Tamu & Kamar</h3><button class="modal-close-btn" onclick="closeModal('hotelGuestModal')"><i class="fas fa-times"></i></button></div><div class="modal-body space-y-4"><div class="flex justify-between items-center"><p class="font-semibold">Dewasa</p><div class="flex items-center gap-3"><button class="counter-btn" onclick="updatePassengerCount('hotel', -1, 'adult')">-</button><span id="hotel-adult-count" class="counter-value">1</span><button class="counter-btn" onclick="updatePassengerCount('hotel', 1, 'adult')">+</button></div></div><div class="flex justify-between items-center"><div><p class="font-semibold">Anak</p><p class="text-xs text-muted">(Dibawah 12 tahun)</p></div><div class="flex items-center gap-3"><button class="counter-btn" onclick="updatePassengerCount('hotel', -1, 'child')">-</button><span id="hotel-child-count" class="counter-value">0</span><button class="counter-btn" onclick="updatePassengerCount('hotel', 1, 'child')">+</button></div></div><div class="flex justify-between items-center"><p class="font-semibold">Kamar</p><div class="flex items-center gap-3"><button class="counter-btn" onclick="updatePassengerCount('hotel', -1, 'room')">-</button><span id="hotel-room-count" class="counter-value">1</span><button class="counter-btn" onclick="updatePassengerCount('hotel', 1, 'room')">+</button></div></div></div><div class="modal-footer"><button class="btn-primary w-full" onclick="savePassengerSelection('hotel')">Simpan</button></div></div></div>`;
+    document.body.insertAdjacentHTML('beforeend', passengerModalHTML);
+    document.body.insertAdjacentHTML('beforeend', hotelGuestModalHTML);
+}
+
+
+// --- Letakkan kode ini di dalam file main.js ---
+
+function setupFlightFormListeners() {
+    // LOGIKA UNTUK TOMBOL PERGI-PULANG
+    const roundTripToggle = document.getElementById('round-trip-toggle');
+    const returnDateContainer = document.getElementById('return-date-container');
+    const returnDateInput = document.querySelector('input[name="returnDate"]');
+
+    if (roundTripToggle && returnDateContainer && returnDateInput) {
+        roundTripToggle.addEventListener('change', (event) => {
+            if (event.target.checked) {
+                // Jika dicentang (Pergi-Pulang), tampilkan input tanggal pulang
+                returnDateContainer.classList.remove('hidden');
+                returnDateInput.required = true;
+            } else {
+                // Jika tidak dicentang (Sekali Jalan), sembunyikan
+                returnDateContainer.classList.add('hidden');
+                returnDateInput.required = false;
+            }
+        });
+    } else {
+        console.warn("Salah satu elemen untuk fitur pergi-pulang tidak ditemukan.");
+    }
+}
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    if (modalId === 'passengerModal') {
+        tempPassengerCounts = { ...passengerCounts };
+        document.getElementById('adult-count').textContent = tempPassengerCounts.adult;
+        document.getElementById('child-count').textContent = tempPassengerCounts.child;
+        document.getElementById('infant-count').textContent = tempPassengerCounts.infant;
+    } else if (modalId === 'hotelGuestModal') {
+        tempHotelGuestCounts = { ...hotelGuestCounts };
+        document.getElementById('hotel-adult-count').textContent = tempHotelGuestCounts.adult;
+        document.getElementById('hotel-child-count').textContent = tempHotelGuestCounts.child;
+        document.getElementById('hotel-room-count').textContent = tempHotelGuestCounts.room;
+    }
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.add('active'), 10);
+}
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.remove('active');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+}
+function updatePassengerCount(modalType, amount, countType) {
+    let counts, uiMap;
+    if (modalType === 'passenger') {
+        counts = tempPassengerCounts;
+        uiMap = { adult: 'adult-count', child: 'child-count', infant: 'infant-count' };
+    } else {
+        counts = tempHotelGuestCounts;
+        uiMap = { adult: 'hotel-adult-count', child: 'hotel-child-count', room: 'hotel-room-count' };
+    }
+    counts[countType] = (counts[countType] || 0) + amount;
+    if ((countType === 'adult' || countType === 'room') && counts[countType] < 1) counts[countType] = 1;
+    if ((countType === 'child' || countType === 'infant') && counts[countType] < 0) counts[countType] = 0;
+    if (modalType === 'passenger' && counts.infant > counts.adult) {
+        counts.infant = counts.adult;
+        showNotification("Jumlah bayi tidak boleh melebihi jumlah dewasa.");
+    }
+    for (const key in uiMap) {
+        const el = document.getElementById(uiMap[key]);
+        if (el) el.textContent = counts[key];
+    }
+}
+function savePassengerSelection(modalType) {
+    if (modalType === 'passenger') {
+        passengerCounts = { ...tempPassengerCounts };
+        const activeType = document.querySelector('.content-section:not(.hidden)')?.id;
+        if (activeType) {
+            const passengerText = document.getElementById(`${activeType}PassengerText`);
+            if (passengerText) {
+                let text = `${passengerCounts.adult} Dewasa`;
+                if (passengerCounts.child > 0) text += `, ${passengerCounts.child} Anak`;
+                if (passengerCounts.infant > 0) text += `, ${passengerCounts.infant} Bayi`;
+                passengerText.textContent = text;
+            }
+        }
+        closeModal('passengerModal');
+    } else {
+        hotelGuestCounts = { ...tempHotelGuestCounts };
+        const guestText = document.getElementById('hotelGuestText');
+        if (guestText) {
+            let text = `${hotelGuestCounts.adult} Dewasa`;
+            if (hotelGuestCounts.child > 0) text += `, ${hotelGuestCounts.child} Anak`;
+            text += `, ${hotelGuestCounts.room} Kamar`;
+            guestText.textContent = text;
+        }
+        closeModal('hotelGuestModal');
+    }
+}
+
+
+function handleScroll() {
+    document.getElementById('header')?.classList.toggle('scrolled', window.scrollY > 10);
+}
+function openMenu() {
+    document.getElementById('sideMenu').style.left = '0';
+    document.getElementById('menuOverlay').classList.remove('invisible', 'opacity-0');
+}
+function closeMenu() {
+    document.getElementById('sideMenu').style.left = '-100%';
+    document.getElementById('menuOverlay').classList.add('invisible', 'opacity-0');
+}
+function goBack() {
+    if (document.getElementById('loadingOverlay').style.display === 'flex') return;
+    const lastState = navigationStack.pop();
+    if (lastState) {
+        const currentSection = document.querySelector('.content-section:not(.hidden)');
+        if (currentSection) {
+            currentSection.classList.add('hidden');
+        }
+        setActiveNav(lastState.id, true, lastState);
+    } else {
+        setActiveNav('homepage', true);
+    }
+    if (window.updateUserUI) window.updateUserUI();
+}
+function saveStateAndProceed(currentSectionId, nextRenderFunction, ...args) {
+    const currentSection = document.getElementById(currentSectionId);
+    if (!currentSection) return;
+    navigationStack.push({
+        id: currentSection.id,
+        content: currentSection.innerHTML,
+        title: document.querySelector('#header h1').textContent,
+        scrollPos: window.scrollY
+    });
+    if (typeof nextRenderFunction === 'function') {
+        nextRenderFunction(...args);
+    }
+}
+function saveAndNavigate(section, params = {}) {
+    const currentSection = document.querySelector('.content-section:not(.hidden)');
+    if (currentSection && currentSection.id !== section) {
+        navigationStack.push({
+            id: currentSection.id,
+            content: currentSection.innerHTML,
+            title: document.querySelector('#header h1').textContent,
+            scrollPos: window.scrollY
+        });
+    }
+    setActiveNav(section, false, null, params);
+}
+function updateHeader(section, subpageTitle = null) {
+    const titleEl = document.querySelector('#header h1');
+    const leftButtonContainer = document.getElementById('header-left');
+    if (!titleEl || !leftButtonContainer) return;
+    const titles = {
+        homepage: "A-GIN TRAVEL",
+        pesawat: "Tiket Pesawat",
+        'pesawat-grup': "Tiket Pesawat Grup", // <-- JUDUL BARU DITAMBAHKAN
+        kereta: "Tiket Kereta",
+        hotel: "Pesan Hotel",
+        'hotel-detail': "Detail Hotel",
+        pelni: "Tiket PELNI",
+        ferry: "Tiket Ferry",
+        pulsa: "Pulsa & Data",
+        berita: "Berita Travel",
+        'ai-planner': "Rencana AI",
+        'contact-us': "Pusat Bantuan",
+        'tentang-kami': "Tentang Kami",
+        'report': "Laporan Masalah",
+        pengaturan: "Pengaturan",
+        topup: "Isi Saldo",
+        withdrawal: "Tarik Saldo",
+        'pin-setup': "Atur PIN Keamanan",
+        'penerjemah': "Penerjemah",
+        'kebijakan-privasi': "Kebijakan Privasi"
+    };
+    titleEl.textContent = subpageTitle || titles[section] || "Halaman";
+    if (navigationStack.length > 0) {
+        leftButtonContainer.innerHTML = `<button onclick="goBack()" aria-label="Kembali" class="text-2xl w-8 text-center"><i class="fas fa-arrow-left"></i></button>`;
+    } else {
+        if (window.updateUserUI) window.updateUserUI();
+    }
+}
+function setActiveNav(section, isBack = false, restoredState = null, params = {}) {
+    // Menangani kelas 'chat-active' untuk layout halaman chat
+    document.body.classList.remove('chat-active');
+    if (section === 'chat') {
+        document.body.classList.add('chat-active');
+    }
+
+    document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+    const targetSection = document.getElementById(section);
+    if (!targetSection) return;
+
+    targetSection.classList.remove('hidden');
+
+    if (!isBack && ['homepage', 'pesawat', 'pesawat-grup', 'kereta', 'hotel', 'pelni', 'ferry', 'pulsa', 'contact-us', 'berita', 'chat'].includes(section)) {
+        navigationStack = [];
+    }
+
+    if (restoredState) {
+        targetSection.innerHTML = restoredState.content;
+        updateHeader(restoredState.id, restoredState.title);
+        setTimeout(() => window.scrollTo(0, restoredState.scrollPos || 0), 0);
+    } else {
+        const renderActions = {
+            'homepage': renderHomepage,
+            'pesawat': () => renderBookingForm('pesawat'),
+            'pesawat-grup': renderPesawatGrupForm,
+            'kereta': () => renderBookingForm('kereta'),
+            'hotel': renderHotelBookingForm,
+            'pelni': () => renderBookingForm('pelni'),
+            'ferry': () => renderBookingForm('ferry'),
+            'pulsa': renderPulsaPage,
+            'berita': renderBeritaPage,
+            'chat': renderChat,
+            'contact-us': renderContactUs,
+            'tentang-kami': renderTentangKami,
+            'report': renderReportForm,
+            'topup': () => renderTopUpPage(params.activeTab),
+            'withdrawal': renderWithdrawalPage,
+            'pin-setup': renderPinSetupForm,
+            'pengaturan': renderPengaturan,
+            'ai-planner': renderAiPlannerForm,
+            'penerjemah': renderPenerjemah,
+            'kebijakan-privasi': renderPrivacyPolicy
+        };
+        if (renderActions[section]) {
+            renderActions[section]();
+        }
+        updateHeader(section);
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    
+    const navMapping = {
+        'pesawat': 'Cari',
+        'pesawat-grup': 'Cari',
+        'kereta': 'Cari',
+        'hotel': 'Cari',
+        'pelni': 'Cari',
+        'ferry': 'Cari',
+        'homepage': 'Home',
+        'berita': 'Berita',
+        'chat': 'Chat',
+        'contact-us': 'Kontak'
+    };
+
+    const activeNavName = navMapping[section] || 'Home';
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.querySelector('span')?.textContent === activeNavName) {
+            btn.classList.add('active');
+        }
+    });
+
+    if (!isBack) closeMenu();
+    if (!restoredState) window.scrollTo({ top: 0, behavior: 'smooth' });
+} // <-- PASTIKAN KURUNG KURAWAL PENUTUP INI ADA
+function renderHomepage() {
+    const container = document.getElementById('homepage');
+    if (!container) return;
+    const bannerImages = ['garuda.jpg', 'lion.jpg', 'pelni.jpg'];
+    const bannerHTML = `<div class="hero-banner-container">${bannerImages.map(url => `<div class="banner-item"><img src="${url}" alt="Promo Banner"></div>`).join('')}</div>`;
+    const saldoCardHTML = `<div class="saldo-card"><div class="saldo-info"><p class="saldo-label">Saldo Anda</p><h3 id="saldo-amount-display" class="saldo-amount">Rp 0</h3></div><div class="saldo-actions"><div class="action-btn" onclick="goToTopUp()"><i class="fas fa-plus-circle"></i><span>Isi Saldo</span></div><div class="action-btn" onclick="goToWithdrawal()"><i class="fas fa-hand-holding-usd"></i><span>Tarik Saldo</span></div><div class="action-btn" onclick="goToPay()"><i class="fas fa-qrcode"></i><span>Bayar</span></div><div class="action-btn" onclick="goToHistory()"><i class="fas fa-history"></i><span>Riwayat</span></div></div></div>`;
+    container.innerHTML = `${bannerHTML}<div class="homepage-content-wrapper">${saldoCardHTML}<div class="menu-grid"><div class="menu-card" onclick="saveAndNavigate('pesawat')"><div class="feature-icon bg-blue-500"><i class="fas fa-plane-departure"></i></div><p>Pesawat</p></div><div class="menu-card" onclick="saveAndNavigate('pesawat-grup')"><div class="feature-icon bg-teal-500"><i class="fas fa-users"></i></div><p>Pesawat Grup</p></div><div class="menu-card" onclick="saveAndNavigate('kereta')"><div class="feature-icon bg-emerald-500"><i class="fas fa-train"></i></div><p>Kereta</p></div><div class="menu-card" onclick="saveAndNavigate('hotel')"><div class="feature-icon bg-amber-500"><i class="fas fa-hotel"></i></div><p>Hotel</p></div><div class="menu-card" onclick="saveAndNavigate('pelni')"><div class="feature-icon bg-indigo-500"><i class="fas fa-ship"></i></div><p>PELNI</p></div><div class="menu-card" onclick="saveAndNavigate('ferry')"><div class="feature-icon bg-pink-500"><i class="fas fa-ferry"></i></div><p>Ferry</p></div><div class="menu-card" onclick="saveAndNavigate('pulsa')"><div class="feature-icon bg-purple-500"><i class="fas fa-mobile-alt"></i></div><p>Pulsa</p></div><div class="menu-card" onclick="saveAndNavigate('ai-planner')"><div class="feature-icon bg-fuchsia-500"><i class="fas fa-magic"></i></div><p>Rencana AI</p></div><div class="menu-card" onclick="saveAndNavigate('penerjemah')"><div class="feature-icon bg-cyan-500"><i class="fas fa-language"></i></div><p>Penerjemah</p></div><div class="menu-card" onclick="saveAndNavigate('contact-us')"><div class="feature-icon bg-gray-500"><i class="fas fa-headset"></i></div><p>Pusat Bantuan</p></div></div></div>`;
+    renderSaldo();
+}
+
+function renderPesawatGrupForm() {
+    const container = document.getElementById('pesawat-grup');
+    if (!container) return;
+
+    const airlineOptions = DB.airlines.map(airline => `<option value="${airline}">${airline}</option>`).join('');
+
+    const today = new Date();
+    today.setDate(today.getDate() + 14);
+    const minDate = today.toISOString().split('T')[0];
+
+    container.innerHTML = `
+        <div class="p-4">
+            <div class="form-section !p-0">
+                <form id="groupFlightForm" onsubmit="event.preventDefault(); handleGroupFlightRequest();" class="p-6 space-y-3">
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-1 flex items-center"><i class="fas fa-plane w-5 mr-2 text-gray-400"></i>Maskapai</label>
+                        <select id="grupMaskapai" class="modern-select" required>
+                            <option value="" disabled selected>Pilih Maskapai</option>
+                            ${airlineOptions}
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <label class="block text-sm font-medium text-muted mb-1 flex items-center"><i class="fas fa-plane-departure w-5 mr-2 text-gray-400"></i>Dari</label>
+                        <input type="text" id="grupDari" class="modern-input" placeholder="Pilih bandara asal" required autocomplete="off">
+                        <div class="autocomplete-suggestions"></div>
+                    </div>
+                    
+                    <div class="text-center my-[-5px] relative z-10">
+                         <button type="button" onclick="swapGroupAirports()" class="w-10 h-10 rounded-full border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-blue-500 hover:bg-gray-100 transition-transform duration-300 transform hover:rotate-180">
+                             <i class="fas fa-exchange-alt"></i>
+                         </button>
+                    </div>
+
+                    <div class="relative">
+                        <label class="block text-sm font-medium text-muted mb-1 flex items-center"><i class="fas fa-plane-arrival w-5 mr-2 text-gray-400"></i>Ke</label>
+                        <input type="text" id="grupKe" class="modern-input" placeholder="Pilih bandara tujuan" required autocomplete="off">
+                        <div class="autocomplete-suggestions"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-1 flex items-center"><i class="fas fa-calendar-alt w-5 mr-2 text-gray-400"></i>Berangkat</label>
+                        <div class="flex items-center">
+                            <input type="date" id="grupBerangkat" class="modern-input" required min="${minDate}">
+                            <div class="ml-4 flex items-center whitespace-nowrap">
+                                 <label for="grupSekaliJalan" class="relative inline-flex items-center cursor-pointer">
+                                     <input type="checkbox" value="" id="grupSekaliJalan" class="sr-only peer" checked>
+                                     <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:bg-gray-700 peer-checked:bg-blue-600"></div>
+                                     <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Sekali Jalan?</span>
+                                 </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="grupPulangContainer" class="hidden">
+                        <label class="block text-sm font-medium text-muted mb-1 flex items-center">
+                            <i class="fas fa-calendar-alt w-5 mr-2 text-gray-400"></i>Pulang
+                        </label>
+                        <input type="date" id="grupPulang" class="modern-input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-1 flex items-center"><i class="fas fa-users w-5 mr-2 text-gray-400"></i>Penumpang</label>
+                        <input type="number" id="grupPenumpang" class="modern-input" placeholder="Min. 10, Maks. 100" min="10" max="100" value="10" required>
+                         <p class="text-xs text-muted mt-1">Min. 10 pax, maks. 100 pax.</p>
+                    </div>
+                    
+                    <div class="pt-2">
+                        <button type="submit" class="btn-primary w-full text-lg">
+                            Kirim Permintaan
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="mt-6 p-5 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
+                <h3 class="font-bold mb-3 text-lg">Informasi tiket pesawat grup</h3>
+                <ul class="list-disc list-inside space-y-2 text-sm text-muted">
+                    <li>Permintaan grup min. 14 hari sebelum tanggal keberangkatan.</li>
+                    <li>Min. 10 pax.</li>
+                    <li>Respon request maks. 2x24 jam pada hari kerja.</li>
+                </ul>
+            </div>
+            <div class="text-center mt-6 text-sm">
+                <p>Butuh bantuan? <a href="#" onclick="event.preventDefault(); saveAndNavigate('contact-us')" class="font-semibold text-blue-600 dark:text-blue-400">Hubungi kami</a></p>
+            </div>
+        </div>
+    `;
+    
+    // Inisialisasi autocomplete
+    setupAutocomplete(document.getElementById('grupDari'), DB.airports);
+    setupAutocomplete(document.getElementById('grupKe'), DB.airports);
+
+    // === KODE BARU: Logika untuk menampilkan/menyembunyikan kalender pulang ===
+    const sekaliJalanToggle = document.getElementById('grupSekaliJalan');
+    const pulangContainer = document.getElementById('grupPulangContainer');
+    const tanggalPulangInput = document.getElementById('grupPulang');
+
+    sekaliJalanToggle.addEventListener('change', (e) => {
+        // Gunakan toggle class: 'hidden' akan ditambahkan jika checkbox dicentang (true), dan dihapus jika tidak (false)
+        pulangContainer.classList.toggle('hidden', e.target.checked);
+        
+        // Menjadikan input 'required' (wajib diisi) saat terlihat
+        tanggalPulangInput.required = !e.target.checked;
+    });
+    // =======================================================================
+}
+function swapGroupAirports() {
+    const fromInput = document.getElementById('grupDari');
+    const toInput = document.getElementById('grupKe');
+
+    if (fromInput && toInput) {
+        // Simpan sementara nilai input 'Dari'
+        const tempValue = fromInput.value;
+        
+        // Tukar nilai
+        fromInput.value = toInput.value;
+        toInput.value = tempValue;
+    }
+}
+
+// letakkan TEPAT DI ATAS fungsi ini di file Anda
+function handleGroupFlightRequest() {
+    // ... isi fungsi Anda yang sudah ada ...
+}
+
+function handleGroupFlightRequest() {
+    const maskapai = document.getElementById('grupMaskapai').value;
+    const dari = document.getElementById('grupDari').value;
+    const ke = document.getElementById('grupKe').value;
+    const berangkat = document.getElementById('grupBerangkat').value;
+    const penumpang = document.getElementById('grupPenumpang').value;
+
+    if (!maskapai || !dari || !ke || !berangkat || !penumpang) {
+        showNotification("Harap lengkapi semua data permintaan.");
+        return;
+    }
+    
+    showLoading('Mengirim permintaan Anda...');
+    
+    // Simulasi pengiriman data
+    setTimeout(() => {
+        hideLoading();
+        showNotification("Permintaan terkirim! Tim kami akan segera menghubungi Anda.");
+        setActiveNav('homepage', true);
+    }, 2500);
+}
+// --- AKHIR BAGIAN BARU ---
+
+function renderSaldo() {
+    const saldoDisplay = document.getElementById('saldo-amount-display');
+    if (saldoDisplay) {
+        let balance = localStorage.getItem('userBalance') || '5000000';
+        localStorage.setItem('userBalance', balance);
+        saldoDisplay.textContent = `Rp ${parseFloat(balance).toLocaleString('id-ID')}`;
+    }
+}
+function goToTopUp() {
+    handleProtectedAction(() => {
+        saveAndNavigate('topup');
+    });
+}
+function goToPay() {
+    showNotification("Fitur Pembayaran (QRIS) segera hadir!");
+}
+function goToHistory() {
+    handleProtectedAction(() => {
+        saveAndNavigate('topup', { activeTab: 'history' });
+    });
+}
+
+// --- FUNGSI TOP UP ---
+function formatCurrency(amount) {
+    return `Rp ${parseFloat(amount).toLocaleString('id-ID')}`;
+}
+function generateTransactionId() {
+    return `TRX${Date.now()}${Math.floor(Math.random() * 1000)}`;
+}
+function getTopUpHistory() {
+    return JSON.parse(localStorage.getItem('topUpHistory')) || [];
+}
+function saveTopUpHistory(history) {
+    localStorage.setItem('topUpHistory', JSON.stringify(history));
+}
+function copyToClipboard(text) {
+    if (!navigator.clipboard) {
+        showNotification('Fitur salin tidak didukung browser ini.');
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        showNotification('Nomor VA berhasil disalin!');
+    }, (err) => {
+        showNotification('Gagal menyalin nomor VA.');
+    });
+}
+function renderTopUpPage(activeTab = 'form') {
+    const container = document.getElementById('topup');
+    if (!container) return;
+    updateHeader('topup');
+    let balance = localStorage.getItem('userBalance') || '0';
+    container.innerHTML = `<div class="form-section"><div class="text-center mb-6"><p class="text-muted">Saldo Anda Saat Ini</p><h2 class="text-3xl font-bold">${formatCurrency(balance)}</h2></div><div class="tab-container mb-6"><button id="tab-form" class="tab-btn ${activeTab === 'form' ? 'active' : ''}" onclick="switchTopUpTab('form')">Isi Ulang</button><button id="tab-history" class="tab-btn ${activeTab === 'history' ? 'active' : ''}" onclick="switchTopUpTab('history')">Riwayat</button></div><div id="topup-tab-content"></div></div><style>.tab-container { display: flex; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; } .tab-btn { flex: 1; padding: 0.75rem; border: none; background-color: transparent; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: all 0.2s ease-in-out; } .tab-btn.active { background-color: var(--primary-color); color: white; } .nominal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.75rem; } .nominal-btn { padding: 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem; text-align: center; font-weight: 600; cursor: pointer; transition: all 0.2s ease-in-out; } .nominal-btn.active, .nominal-btn:hover { border-color: var(--primary-color); background-color: var(--primary-light); } .history-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); } .history-item:last-child { border-bottom: none; } .status-badge { padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; } .status-success { background-color: #dcfce7; color: #16a34a; } .status-withdrawal { background-color: #fee2e2; color: #ef4444; } .payment-method-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem; cursor: pointer; } .payment-method-card .bank-logo { height: 20px; width: auto; } .copy-btn { background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 0.5rem 0.75rem; border-radius: 0.375rem; cursor: pointer; }</style>`;
+    switchTopUpTab(activeTab);
+}
+function switchTopUpTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    if (tabName === 'form') {
+        renderTopUpAmountForm();
+    } else {
+        renderTopUpHistoryList();
+    }
+}
+function renderTopUpAmountForm() {
+    const contentContainer = document.getElementById('topup-tab-content');
+    if (!contentContainer) return;
+    const nominalOptions = [50000, 100000, 150000, 200000, 300000, 500000];
+    contentContainer.innerHTML = `<h3 class="font-semibold mb-3">Pilih Nominal</h3><div class="nominal-grid mb-4">${nominalOptions.map(n => `<div class="nominal-btn" onclick="selectNominal(${n}, this)">${formatCurrency(n)}</div>`).join('')}</div><h3 class="font-semibold mb-3">Atau Masukkan Nominal Lain</h3><input type="number" id="customAmount" class="modern-input" placeholder="Min. ${formatCurrency(10000)}"><button class="btn-primary w-full !mt-6" onclick="proceedToPaymentMethods()">Lanjutkan</button>`;
+    document.getElementById('customAmount').addEventListener('input', function() {
+        document.querySelectorAll('.nominal-btn').forEach(btn => btn.classList.remove('active'));
+    });
+}
+
+function renderChat() {
+    // Memanggil fungsi loadChatContacts yang ada di file chat.js
+    if (window.app && typeof window.app.loadChatContacts === 'function') {
+        window.app.loadChatContacts();
+    } else {
+        console.error("Fungsi untuk memuat kontak chat tidak ditemukan.");
+        const contactList = document.getElementById('contact-list');
+        if (contactList) {
+            contactList.innerHTML = `<p class="text-center text-red-500 p-4">Terjadi kesalahan saat memuat chat.</p>`;
+        }
+    }
+}
+function selectNominal(amount, element) {
+    document.querySelectorAll('.nominal-btn').forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+    document.getElementById('customAmount').value = '';
+}
+function proceedToPaymentMethods() {
+    let amount = 0;
+    const selectedNominal = document.querySelector('.nominal-btn.active');
+    if (selectedNominal) {
+        amount = parseFloat(selectedNominal.textContent.replace(/[^0-9]/g, ''));
+    } else {
+        amount = parseFloat(document.getElementById('customAmount').value);
+    }
+    if (isNaN(amount) || amount < 10000) {
+        showNotification("Jumlah top up minimum adalah Rp 10.000.");
+        return;
+    }
+    saveStateAndProceed('topup', renderPaymentMethods, amount);
+}
+function renderPaymentMethods(amount) {
+    const container = document.getElementById('topup');
+    if (!container) return;
+    updateHeader('topup', 'Pilih Metode Pembayaran');
+    const bcaLogoPath = 'bca_logo.png';
+    const mandiriLogoPath = 'mandiri_logo.png';
+    container.innerHTML = `<div class="form-section"><div class="text-center mb-6"><p class="text-muted">Total Pembayaran</p><h2 class="text-3xl font-bold">${formatCurrency(amount)}</h2></div><h3 class="font-semibold mb-3 text-muted">Virtual Account</h3><div class="space-y-3 mb-6"><div class="payment-method-card" onclick="selectPaymentMethod('BCA Virtual Account', ${amount})"><div class="flex items-center gap-4"><img src="${bcaLogoPath}" alt="BCA Logo" class="bank-logo"><span class="font-semibold">BCA Virtual Account</span></div><i class="fas fa-chevron-right text-gray-400"></i></div><div class="payment-method-card" onclick="selectPaymentMethod('Mandiri Virtual Account', ${amount})"><div class="flex items-center gap-4"><img src="${mandiriLogoPath}" alt="Mandiri Logo" class="bank-logo"><span class="font-semibold">Mandiri Virtual Account</span></div><i class="fas fa-chevron-right text-gray-400"></i></div></div><h3 class="font-semibold mb-3 text-muted">E-Wallet</h3><div class="space-y-3"><div class="payment-method-card" onclick="selectPaymentMethod('QRIS', ${amount})"><div class="flex items-center gap-4"><i class="fas fa-qrcode text-2xl text-sky-500"></i><span class="font-semibold">QRIS</span></div><i class="fas fa-chevron-right text-gray-400"></i></div></div></div>`;
+}
+function selectPaymentMethod(method, amount) {
+    saveStateAndProceed('topup', renderPaymentInstructionsPage, method, amount);
+}
+function renderPaymentInstructionsPage(method, amount) {
+    const container = document.getElementById('topup');
+    if (!container) return;
+    updateHeader('topup', 'Instruksi Pembayaran');
+    let instructionsHTML = '';
+    let bankName = '';
+    let vaNumber = '';
+    if (method.includes('Virtual Account')) {
+        if (method.includes('BCA')) {
+            bankName = 'BCA Virtual Account';
+            vaNumber = `3901${'085774712676'}`;
+        } else if (method.includes('Mandiri')) {
+            bankName = 'Mandiri Virtual Account';
+            vaNumber = `88899${'081219154973'}`;
+        }
+        instructionsHTML = `<p class="text-muted mb-2">Selesaikan pembayaran ke nomor Virtual Account di bawah ini:</p><div class="bg-gray-100 dark:bg-gray-800/50 p-4 rounded-lg mb-4"><p class="text-sm">${bankName}</p><div class="flex items-center justify-between gap-4 mt-1"><p id="vaNumber" class="text-2xl font-bold tracking-wider">${vaNumber}</p><button class="copy-btn" onclick="copyToClipboard('${vaNumber}')"><i class="fas fa-copy"></i> Salin</button></div></div>`;
+    } else if (method === 'QRIS') {
+        instructionsHTML = `<p class="text-muted mb-4">Scan kode QR di bawah ini menggunakan aplikasi pembayaran Anda.</p><div class="flex justify-center mb-4"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=SimulasiQRIS-AginTravel-${generateTransactionId()}-${amount}" alt="QRIS Code" class="rounded-lg bg-white"></div>`;
+    }
+    container.innerHTML = `<div class="form-section"><div class="text-center mb-6"><p class="text-muted">Total Pembayaran</p><h2 class="text-3xl font-bold">${formatCurrency(amount)}</h2><p class="mt-1 font-semibold">Metode: ${method}</p></div><div class="border-t dark:border-gray-700 pt-6">${instructionsHTML}<button class="btn-primary w-full !mt-6" onclick="simulatePayment('${method}', ${amount})">Saya Sudah Bayar</button><p class="text-xs text-center text-muted mt-4">Ini adalah simulasi. Klik tombol di atas untuk menyelesaikan top up.</p></div></div>`;
+}
+function simulatePayment(method, amount) {
+    showLoading('Mengkonfirmasi pembayaran...');
+    setTimeout(() => {
+        let currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+        const newBalance = currentBalance + amount;
+        localStorage.setItem('userBalance', newBalance);
+        const history = getTopUpHistory();
+        history.unshift({
+            id: generateTransactionId(),
+            date: new Date().toISOString(),
+            method: method,
+            amount: amount,
+            status: 'success'
+        });
+        saveTopUpHistory(history);
+        hideLoading();
+        showNotification('Top up berhasil!');
+        navigationStack = [];
+        setActiveNav('homepage');
+    }, 2500);
+}
+function renderTopUpHistoryList() {
+    const contentContainer = document.getElementById('topup-tab-content');
+    if (!contentContainer) return;
+    const topUpHistory = getTopUpHistory();
+    const withdrawalHistory = getWithdrawalHistory(); // Ambil riwayat penarikan
+    const combinedHistory = [...topUpHistory, ...withdrawalHistory].sort((a, b) => new Date(b.date) - new Date(a.date)); // Gabung dan urutkan
+    if (combinedHistory.length === 0) {
+        contentContainer.innerHTML = `<p class="text-center text-muted p-4">Belum ada riwayat transaksi.</p>`;
+        return;
+    }
+    const historyItemsHTML = combinedHistory.map(item => {
+        const date = new Date(item.date);
+        const isWithdrawal = item.type === 'withdrawal';
+        return `<div class="history-item"><div><p class="font-semibold">${isWithdrawal ? `Tarik Saldo ke ${item.bank}` : item.method}</p><p class="text-sm text-muted">${date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })} - ${date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p></div><div class="text-right"><p class="font-bold ${isWithdrawal ? 'text-red-500' : 'text-green-500'}">${isWithdrawal ? '-' : '+'}${formatCurrency(item.amount)}</p><p class="status-badge ${isWithdrawal ? 'status-withdrawal' : 'status-success'}">Berhasil</p></div></div>`;
+    }).join('');
+    contentContainer.innerHTML = `<div class="space-y-2">${historyItemsHTML}</div>`;
+}
+
+// --- FUNGSI SIMULASI PENARIKAN SALDO & PIN ---
+function goToWithdrawal() {
+    handleProtectedAction(() => {
+        saveAndNavigate('withdrawal');
+    });
+}
+function getWithdrawalHistory() {
+    return JSON.parse(localStorage.getItem('withdrawalHistory')) || [];
+}
+function saveWithdrawalHistory(history) {
+    localStorage.setItem('withdrawalHistory', JSON.stringify(history));
+}
+function renderWithdrawalPage() {
+    const container = document.getElementById('withdrawal');
+    if (!container) return;
+    updateHeader('withdrawal');
+    let balance = localStorage.getItem('userBalance') || '0';
+    const bankOptions = DB.banks.map(bank => `<option value="${bank}">${bank}</option>`).join('');
+    container.innerHTML = `
+        <div class="form-section">
+            <div class="text-center mb-6">
+                <p class="text-muted">Saldo Tersedia</p>
+                <h2 class="text-3xl font-bold">${formatCurrency(balance)}</h2>
+            </div>
+            <form id="withdrawalForm" onsubmit="event.preventDefault(); initiateWithdrawal()" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-muted mb-1">Jumlah Penarikan</label>
+                    <input type="number" id="withdrawalAmount" class="modern-input" placeholder="Min. Rp 10.000" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-muted mb-1">Bank Tujuan</label>
+                    <select id="withdrawalBank" class="modern-select" required>
+                        <option value="" disabled selected>-- Pilih Bank --</option>
+                        ${bankOptions}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-muted mb-1">Nomor Rekening</label>
+                    <input type="number" id="withdrawalAccount" class="modern-input" placeholder="Masukkan nomor rekening" required>
+                </div>
+                <button type="submit" class="btn-primary w-full !mt-6">Lanjutkan</button>
+            </form>
+        </div>`;
+}
+function initiateWithdrawal() {
+    const amount = parseFloat(document.getElementById('withdrawalAmount').value);
+    const bank = document.getElementById('withdrawalBank').value;
+    const account = document.getElementById('withdrawalAccount').value;
+    const currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+    if (isNaN(amount) || amount < 10000) {
+        showNotification("Jumlah penarikan minimum adalah Rp 10.000.");
+        return;
+    }
+    if (amount > currentBalance) {
+        showNotification("Saldo Anda tidak mencukupi.");
+        return;
+    }
+    if (!bank || !account) {
+        showNotification("Harap lengkapi detail bank dan nomor rekening.");
+        return;
+    }
+    const hashedPin = localStorage.getItem('userPin');
+    if (!hashedPin) {
+        showNotification("Anda harus mengatur PIN keamanan terlebih dahulu.");
+        saveAndNavigate('pin-setup');
+        return;
+    }
+    showPinModal({ amount, bank, account });
+}
+function showPinModal(withdrawalData) {
+    document.getElementById('pinVerificationModal')?.remove();
+    const modalHTML = `
+        <div id="pinVerificationModal" class="modal-wrapper active">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="text-lg font-bold">Masukkan PIN Keamanan</h3>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center text-muted mb-4">Untuk melanjutkan penarikan sebesar ${formatCurrency(withdrawalData.amount)}</p>
+                    <input type="password" id="pinInput" class="modern-input text-center tracking-[1rem]" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary w-full" onclick="document.getElementById('pinVerificationModal').remove()">Batal</button>
+                    <button class="btn-primary w-full !mt-2" onclick='handleWithdrawalSimulation(${JSON.stringify(withdrawalData)})'>Konfirmasi</button>
+                </div>
+            </div>
+        </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.getElementById('pinInput').focus();
+}
+function handleWithdrawalSimulation(withdrawalData) {
+    const enteredPin = document.getElementById('pinInput').value;
+    if (enteredPin.length !== 6) {
+        showNotification("PIN harus terdiri dari 6 digit.");
+        return;
+    }
+    const storedHashedPin = localStorage.getItem('userPin');
+    const enteredHashedPin = `simulated-hash-${enteredPin.split('').reverse().join('')}`;
+    if (enteredHashedPin !== storedHashedPin) {
+        showNotification("PIN yang Anda masukkan salah.");
+        return;
+    }
+    document.getElementById('pinVerificationModal')?.remove();
+    showLoading('Memproses penarikan...');
+    setTimeout(() => {
+        let currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+        const newBalance = currentBalance - withdrawalData.amount;
+        localStorage.setItem('userBalance', newBalance);
+        const history = getWithdrawalHistory();
+        history.unshift({
+            id: `WDR${Date.now()}`,
+            date: new Date().toISOString(),
+            amount: withdrawalData.amount,
+            bank: withdrawalData.bank,
+            account: withdrawalData.account,
+            status: 'success',
+            type: 'withdrawal'
+        });
+        saveWithdrawalHistory(history);
+        hideLoading();
+        showNotification('Penarikan saldo berhasil!');
+        navigationStack = [];
+        setActiveNav('homepage');
+    }, 2500);
+}
+
+// --- FUNGSI MANAJEMEN PIN ---
+function renderPinSetupForm() {
+    const container = document.getElementById('pin-setup');
+    if (!container) return;
+    updateHeader('pin-setup');
+    const hasPin = !!localStorage.getItem('userPin');
+    container.innerHTML = `
+        <div class="form-section">
+            <div class="text-center mb-6">
+                <i class="fas fa-shield-alt text-5xl text-blue-500 mb-3"></i>
+                <h2 class="text-2xl font-bold">${hasPin ? 'Ubah PIN Keamanan' : 'Buat PIN Keamanan'}</h2>
+                <p class="text-muted">PIN digunakan untuk verifikasi transaksi penting.</p>
+            </div>
+            <form id="pinSetupForm" onsubmit="event.preventDefault(); handlePinUpdate()" class="space-y-4">
+                ${hasPin ? `<div><label class="block text-sm font-medium text-muted mb-1">PIN Lama</label><input type="password" id="oldPin" class="modern-input" maxlength="6" required></div>` : ''}
+                <div>
+                    <label class="block text-sm font-medium text-muted mb-1">PIN Baru (6 Digit)</label>
+                    <input type="password" id="newPin" class="modern-input" maxlength="6" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-muted mb-1">Konfirmasi PIN Baru</label>
+                    <input type="password" id="confirmNewPin" class="modern-input" maxlength="6" required>
+                </div>
+                <button type="submit" class="btn-primary w-full !mt-6">Simpan PIN</button>
+            </form>
+        </div>`;
+}
+function handlePinUpdate() {
+    const newPin = document.getElementById('newPin').value;
+    const confirmNewPin = document.getElementById('confirmNewPin').value;
+    const hasPin = !!localStorage.getItem('userPin');
+    if (newPin.length !== 6 || !/^\d{6}$/.test(newPin)) {
+        showNotification("PIN harus terdiri dari 6 angka.");
+        return;
+    }
+    if (newPin !== confirmNewPin) {
+        showNotification("Konfirmasi PIN baru tidak cocok.");
+        return;
+    }
+    if (hasPin) {
+        const oldPin = document.getElementById('oldPin').value;
+        const storedHashedPin = localStorage.getItem('userPin');
+        const oldHashedPin = `simulated-hash-${oldPin.split('').reverse().join('')}`;
+        if (oldHashedPin !== storedHashedPin) {
+            showNotification("PIN lama yang Anda masukkan salah.");
+            return;
+        }
+    }
+    const newHashedPin = `simulated-hash-${newPin.split('').reverse().join('')}`;
+    localStorage.setItem('userPin', newHashedPin);
+    showNotification(`PIN berhasil ${hasPin ? 'diperbarui' : 'dibuat'}!`);
+    goBack();
+}
+
+// --- FUNGSI HALAMAN LAINNYA ---
+function renderBeritaPage() {
+    const container = document.getElementById('berita');
+    if (!container) return;
+    container.innerHTML = `<div class="p-4"><div id="news-container" class="space-y-4"></div></div>`;
+    loadTravelNews();
+}
+async function loadTravelNews() {
+    const newsContainer = document.getElementById('news-container');
+    if (!newsContainer) return;
+    newsContainer.innerHTML = '<p class="text-center text-muted p-4">Memuat berita terkini...</p>';
+    const NEWS_API_KEY = '2fa4ed0c83bf408882b74546d0f39829';
+    const keywords = '"Promo kereta api" OR " maskapai penerbangan" OR " bandara" OR "berita kapal laut" OR " kapal PELNI" OR "kapal ferry" OR "Dharma Lautan Utama"';
+    const apiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(keywords)}&language=id&sortBy=publishedAt&pageSize=20&apiKey=${NEWS_API_KEY}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.status === 'ok' && data.articles.length > 0) {
+            newsContainer.innerHTML = '';
+            data.articles.forEach(article => {
+                const imageUrl = article.urlToImage ? article.urlToImage : 'https://via.placeholder.com/400x200.png?text=A-GIN+Travel';
+                const newsCard = `
+                    <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 mb-4">
+                        <img src="${imageUrl}" alt="${article.title}" class="w-full h-40 object-cover border-b border-gray-200 dark:border-gray-700">
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg leading-tight">${article.title}</h3>
+                            <div class="flex justify-between items-center text-xs text-muted mt-3">
+                                <span class="font-semibold">${article.source.name}</span>
+                                <span>${new Date(article.publishedAt).toLocaleDateString('id-ID')}</span>
+                            </div>
+                        </div>
+                    </a>`;
+                newsContainer.innerHTML += newsCard;
+            });
+        } else {
+            newsContainer.innerHTML = `<p class="text-center text-red-500 p-4">Saat ini tidak ada berita yang ditemukan.</p>`;
+        }
+    } catch (error) {
+        console.error('Gagal mengambil berita:', error);
+        newsContainer.innerHTML = `<p class="text-center text-red-500 p-4">Gagal memuat berita.<br><small>${error.message}</small></p>`;
+    }
+}
+function renderContactUs() {
+    const container = document.getElementById('contact-us');
+    if (!container) return;
+    container.innerHTML = `<div class="form-section"><h2 class="text-2xl font-bold text-center mb-4">Pusat Bantuan</h2><div class="mb-8 pt-6"><h3 class="text-xl font-bold text-center mb-4">Pertanyaan Umum (FAQ)</h3><div class="space-y-2"><details class="faq-item"><summary>Bagaimana cara memesan tiket?</summary><p>Pilih menu layanan (contoh: Pesawat), isi detail perjalanan, pilih jadwal, isi data penumpang, lalu lanjutkan ke pembayaran.</p></details><details class="faq-item"><summary>Apakah data saya aman?</summary><p>Kami sangat menjaga keamanan data Anda. Semua data sensitif disimpan secara lokal di perangkat Anda.</p></details></div></div><div class="border-t dark:border-gray-700 mt-8 pt-6"><h3 class="text-xl font-bold text-center mb-4">Hubungi Kami</h3><p class="text-center text-muted mb-8">Pilih salah satu platform di bawah ini.</p><div class="grid grid-cols-3 gap-y-8 gap-x-4 text-center"><a href="https://wa.me/6285774712676" target="_blank" class="contact-icon"><div class="icon-wrapper bg-green-100 text-green-500"><i class="fab fa-whatsapp"></i></div><p>WhatsApp</p></a><a href="tel:081219154973" class="contact-icon"><div class="icon-wrapper bg-blue-100 text-blue-500"><i class="fas fa-phone-alt"></i></div><p>Telepon</p></a><a href="mailto:aprhyzsilla1@gmail.com" class="contact-icon"><div class="icon-wrapper bg-red-100 text-red-500"><i class="fas fa-envelope"></i></div><p>Email</p></a><a href="https://www.facebook.com/share/19kVUtRo9f/" target="_blank" class="contact-icon"><div class="icon-wrapper bg-sky-800/10 text-sky-800"><i class="fab fa-facebook-f"></i></div><p>Facebook</p></a><a href="https://www.instagram.com/andho_rakat?igsh=bTI4ODk5ZXVkOXE5" target="_blank" class="contact-icon"><div class="icon-wrapper bg-pink-100 text-pink-500"><i class="fab fa-instagram"></i></div><p>Instagram</p></a></div></div><div class="border-t dark:border-gray-700 mt-10 pt-6 text-center"><p class="text-muted mb-3">Mengalami kendala pada aplikasi?</p><button onclick="saveAndNavigate('report')" class="btn-secondary w-full max-w-xs mx-auto"><i class="fas fa-flag mr-2"></i>Laporkan Masalah</button></div></div><style>.contact-icon{display:flex;flex-direction:column;align-items:center;gap:0.5rem;color:var(--text-color);font-weight:600;font-size:0.875rem;text-decoration:none;}.contact-icon .icon-wrapper{width:4rem;height:4rem;display:flex;align-items:center;justify-content:center;border-radius:9999px;}.contact-icon .icon-wrapper i{font-size:2rem;}html.dark .contact-icon{color:var(--text-color-dark);}html.dark .contact-icon .icon-wrapper{background-color:rgba(255,255,255,0.1);}.faq-item{background:var(--bg-secondary);padding:0.75rem 1rem;border-radius:0.5rem;}.faq-item summary{font-weight:600;cursor:pointer;}.faq-item p{margin-top:0.75rem;color:var(--text-muted);font-size:0.875rem;padding-bottom:0.25rem;}</style>`;
+}
+function renderTentangKami() {
+    const container = document.getElementById('tentang-kami');
+    if (!container) return;
+    container.innerHTML = `<div class="form-section"><h2 class="text-2xl font-bold text-center mb-4">Tentang A-GIN TRAVEL</h2><p class="text-justify">A-GIN TRAVEL adalah super app perjalanan terdepan di Indonesia yang didukung oleh teknologi AI canggih untuk memberikan pengalaman pemesanan tiket yang mudah, aman, dan terpercaya. Misi kami adalah menjadi sahabat perjalanan Anda, ke mana pun tujuannya.</p></div>`;
+}
+function renderReportForm() {
+    const container = document.getElementById('report');
+    if (!container) return;
+    container.innerHTML = `<div class="form-section"><div class="text-center mb-6"><i class="fas fa-flag text-5xl text-red-400 mb-3"></i><h2 class="text-2xl font-bold">Formulir Laporan</h2><p class="text-muted">Bantu kami menjadi lebih baik.</p></div><form id="reportForm" onsubmit="event.preventDefault(); handleReportSubmit();" class="space-y-4"><div><label class="block text-sm font-medium text-muted mb-1">Kategori Masalah</label><select id="reportCategory" class="modern-select" required><option value="" disabled selected>-- Pilih Kategori --</option><option value="Masalah Pembayaran">Masalah Pembayaran</option><option value="Aplikasi Error/Bug">Aplikasi Error/Bug</option><option value="Saran & Masukan">Saran & Masukan</option><option value="Akun Saya">Akun Saya</option><option value="Lainnya">Lainnya</option></select></div><div><label class="block text-sm font-medium text-muted mb-1">Deskripsi</label><textarea id="reportDescription" class="modern-input" rows="5" placeholder="Jelaskan masalah yang Anda alami..." required></textarea></div><div><label class="block text-sm font-medium text-muted mb-1">Email Anda (Opsional)</label><input type="email" id="reportEmail" class="modern-input" placeholder="Agar kami bisa menghubungi Anda"></div><button type="submit" class="btn-primary w-full !mt-6"><i class="fas fa-paper-plane mr-2"></i>Kirim Laporan</button></form></div>`;
+}
+function renderPengaturan() {
+    const container = document.getElementById('pengaturan');
+    if (!container) return;
+    container.innerHTML = `<div class="space-y-6"><div><h3 class="font-semibold text-lg mb-2 text-gray-500 dark:text-gray-400">Akun Saya</h3><div class="form-section !p-0 divide-y divide-[var(--border-color)]"><div class="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50" onclick="handleProtectedAction(() => saveStateAndProceed('pengaturan', renderEditProfileForm));"><span><i class="fas fa-user-edit w-6 mr-3 text-gray-400"></i>Edit Profil</span><i class="fas fa-chevron-right text-gray-400"></i></div><div class="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50" onclick="handleProtectedAction(() => saveAndNavigate('pin-setup'));"><span><i class="fas fa-shield-alt w-6 mr-3 text-gray-400"></i>Atur PIN Keamanan</span><i class="fas fa-chevron-right text-gray-400"></i></div><div class="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50" onclick="handleProtectedAction(() => saveStateAndProceed('pengaturan', renderDaftarPenumpang));"><span><i class="fas fa-users w-6 mr-3 text-gray-400"></i>Daftar Penumpang</span><i class="fas fa-chevron-right text-gray-400"></i></div></div></div><div><h3 class="font-semibold text-lg mb-2 text-gray-500 dark:text-gray-400">Preferensi Aplikasi</h3><div class="form-section !p-0 divide-y divide-[var(--border-color)]"><div class="p-4 flex justify-between items-center"><span><i class="fas fa-palette w-6 mr-3 text-gray-400"></i>Mode Tampilan</span><select id="themeSelector" class="modern-select !w-auto !py-1 text-sm"><option value="light">Terang</option><option value="dark">Gelap</option><option value="system">Sistem</option></select></div><div class="p-4 flex justify-between items-center"><span><i class="fas fa-bell w-6 mr-3 text-gray-400"></i>Notifikasi Promo</span><label class="toggle-switch"><input type="checkbox" id="notifToggle" onchange="toggleNotifications()" checked><span class="toggle-slider"></span></label></div></div></div><div><h3 class="font-semibold text-lg mb-2 text-gray-500 dark:text-gray-400">Bantuan & Info</h3><div class="form-section !p-0 divide-y divide-[var(--border-color)]"><div class="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50" onclick="saveAndNavigate('contact-us')"><span><i class="fas fa-headset w-6 mr-3 text-gray-400"></i>Pusat Bantuan</span><i class="fas fa-chevron-right text-gray-400"></i></div><div class="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50" onclick="saveAndNavigate('kebijakan-privasi')"><span><i class="fas fa-shield-alt w-6 mr-3 text-gray-400"></i>Kebijakan Privasi</span><i class="fas fa-chevron-right text-gray-400"></i></div><div class="p-4 flex justify-between items-center"><span><i class="fas fa-code-branch w-6 mr-3 text-gray-400"></i>Versi Aplikasi</span><span class="text-muted">v3.3-Final</span></div></div></div></div>`;
+    const themeSelector = document.getElementById('themeSelector');
+    if (themeSelector) {
+        themeSelector.value = localStorage.getItem('theme') || 'system';
+        themeSelector.addEventListener('change', (e) => {
+            localStorage.setItem('theme', e.target.value);
+            applyTheme();
+        });
+    }
+}
+function handleReportSubmit() {
+    const category = document.getElementById('reportCategory')?.value;
+    const description = document.getElementById('reportDescription')?.value;
+    const userEmail = document.getElementById('reportEmail')?.value;
+    if (!category || !description) {
+        showNotification("Harap isi kategori dan deskripsi laporan.");
+        return;
+    }
+    const subject = `Laporan Aplikasi A-GIN TRAVEL: ${category}`;
+    let body = `Kategori Laporan:\n${category}\n\nDeskripsi Masalah:\n${description}\n\n---------------------\nEmail Pelapor: ${userEmail || 'Tidak diisi'}\nWaktu: ${new Date().toLocaleString('id-ID')}\nVersi Aplikasi: v3.3-Final`;
+    window.location.href = `mailto:aprhyzsilla1@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    showNotification("Membuka aplikasi email untuk mengirim...");
+    setTimeout(() => setActiveNav('homepage', true), 2000);
+}
+function renderPrivacyPolicy() {
+    const container = document.getElementById('kebijakan-privasi');
+    if (!container) return;
+    updateHeader('kebijakan-privasi');
+    container.innerHTML = `<div class="form-section"><div class="text-center mb-6"><i class="fas fa-shield-alt text-5xl text-blue-500 mb-3"></i><h2 class="text-2xl font-bold">Kebijakan Privasi</h2><p class="text-muted">Terakhir diperbarui: ${new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p></div><div class="space-y-6 text-justify"><p>Terima kasih telah menggunakan A-GIN TRAVEL. Kami berkomitmen melindungi privasi data Anda. Kebijakan ini menjelaskan bagaimana kami mengelola informasi Anda.</p><div><h3 class="font-bold text-lg mb-2 flex items-center"><i class="fas fa-database w-6 mr-2 text-blue-400"></i>Informasi yang Kami Kumpulkan</h3><p>Aplikasi ini menyimpan informasi hanya secara lokal di perangkat Anda (\`localStorage\`). Data ini meliputi:</p><ul class="list-disc list-inside pl-4 mt-2 space-y-1"><li><b>Profil Pengguna:</b> Nama, email, telepon, dan foto profil.</li><li><b>Daftar Penumpang:</b> Data penumpang yang Anda simpan.</li><li><b>Preferensi Aplikasi:</b> Pilihan tema dan status notifikasi.</li></ul></div><div><h3 class="font-bold text-lg mb-2 flex items-center"><i class="fas fa-cogs w-6 mr-2 text-blue-400"></i>Bagaimana Kami Menggunakan Informasi</h3><p>Data yang tersimpan digunakan untuk personalisasi, mempercepat pengisian formulir, dan menjalankan fungsi aplikasi sesuai preferensi Anda.</p></div><div><h3 class="font-bold text-lg mb-2 flex items-center"><i class="fas fa-share-alt w-6 mr-2 text-blue-400"></i>Pembagian Informasi</h3><p><b>Kami tidak mengirim atau membagikan data pribadi Anda ke server manapun atau pihak ketiga.</b> Semua data tetap berada di dalam browser perangkat Anda.</p></div><div><h3 class="font-bold text-lg mb-2 flex items-center"><i class="fas fa-user-shield w-6 mr-2 text-blue-400"></i>Hak Anda</h3><p>Anda memiliki kontrol penuh atas data Anda dan dapat menghapusnya kapan saja dengan membersihkan data situs dari pengaturan browser atau menekan tombol "Keluar".</p></div></div></div>`;
+}
+function renderEditProfileForm() {
+    const container = document.getElementById('pengaturan');
+    if (!container) return;
+    updateHeader('pengaturan', 'Edit Profil');
+    let profile = { fullName: 'Pengguna A-GIN', email: 'email@anda.com', phone: '', dob: '', profilePic: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' };
+    if (window.Clerk && window.Clerk.user) {
+        const clerkUser = window.Clerk.user;
+        profile.fullName = clerkUser.fullName || profile.fullName;
+        profile.email = clerkUser.primaryEmailAddress.emailAddress;
+        profile.profilePic = clerkUser.imageUrl || profile.profilePic;
+    }
+    const localProfile = JSON.parse(localStorage.getItem('userProfile'));
+    if (localProfile) {
+        profile = { ...profile, ...localProfile };
+    }
+    container.innerHTML = `<div class="form-section"><div class="text-center mb-6"><div class="relative w-24 h-24 mx-auto"><img id="profilePicPreview" src="${profile.profilePic}" class="w-full h-full rounded-full object-cover shadow-md bg-gray-200"><label for="profilePicInput" class="absolute bottom-0 right-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-blue-600 border-2 border-white dark:border-gray-800"><i class="fas fa-camera text-sm"></i><input type="file" id="profilePicInput" class="hidden" accept="image/*" onchange="previewProfilePic(event)"></label></div></div><form id="editProfileForm" onsubmit="event.preventDefault(); handleProfileUpdate();" class="space-y-4"><div><label class="block text-sm font-medium text-muted mb-1">Nama Lengkap</label><input type="text" id="fullName" class="modern-input" value="${profile.fullName}" required></div><div><label class="block text-sm font-medium text-muted mb-1">Email</label><input type="email" id="email" class="modern-input" value="${profile.email}" disabled></div><div><label class="block text-sm font-medium text-muted mb-1">Nomor Telepon</label><input type="tel" id="phone" class="modern-input" value="${profile.phone || ''}" placeholder="cth: 08123456789"></div><div><label class="block text-sm font-medium text-muted mb-1">Tanggal Lahir</label><input type="date" id="dob" class="modern-input" value="${profile.dob || ''}"></div><button type="submit" class="btn-primary w-full !mt-6">Simpan Perubahan</button></form></div>`;
+}
+function previewProfilePic(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        const output = document.getElementById('profilePicPreview');
+        if (output) output.src = reader.result;
+    };
+    if (event.target.files[0]) {
+        reader.readAsDataURL(event.target.files[0]);
+    }
+}
+function handleProfileUpdate() {
+    const newProfile = {
+        fullName: document.getElementById('fullName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        dob: document.getElementById('dob').value,
+        profilePic: document.getElementById('profilePicPreview').src
+    };
+    localStorage.setItem('userProfile', JSON.stringify(newProfile));
+    showNotification('Profil berhasil diperbarui!');
+    if (window.updateUserUI) {
+        window.updateUserUI();
+    }
+    goBack();
+}
+function renderDaftarPenumpang() {
+    const container = document.getElementById('pengaturan');
+    if (!container) return;
+    updateHeader('pengaturan', 'Daftar Penumpang');
+    const penumpangTersimpan = JSON.parse(localStorage.getItem('savedPassengers')) || [];
+    let listHTML = penumpangTersimpan.map((p, index) => `<div class="flex items-center justify-between p-3 border-b dark:border-gray-600"><div><p class="font-semibold">${p.gender}. ${p.fullName}</p><p class="text-sm text-muted">${p.idType} - ${p.idNumber}</p></div><button onclick="hapusPenumpang(${index})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button></div>`).join('');
+    if (penumpangTersimpan.length === 0) listHTML = `<p class="text-center text-muted p-4">Belum ada penumpang tersimpan.</p>`;
+    container.innerHTML = `<div class="form-section"><h2 class="text-xl font-bold mb-4">Daftar Penumpang Tersimpan</h2><div class="border rounded-lg overflow-hidden mb-6">${listHTML}</div><h3 class="text-lg font-semibold mb-3">Tambah Penumpang Baru</h3><form id="formPenumpangBaru" onsubmit="simpanPenumpang(event)"><div class="space-y-4"><div><label class="block text-sm font-medium text-muted mb-1">Panggilan</label><select name="gender" class="modern-select" required><option value="Tuan">Tuan</option><option value="Nyonya">Nyonya</option><option value="Nona">Nona</option></select></div><div><label class="block text-sm font-medium text-muted mb-1">Nama Lengkap</label><input type="text" name="fullName" class="modern-input" required></div><div><label class="block text-sm font-medium text-muted mb-1">Tipe & No. Identitas</label><div class="grid grid-cols-2 gap-2"><select name="idType" class="modern-select" required><option value="KTP">KTP</option><option value="PASPOR">PASPOR</option></select><input type="text" name="idNumber" class="modern-input" required></div></div></div><button type="submit" class="btn-primary w-full mt-6">Simpan Penumpang</button></form></div>`;
+}
+function simpanPenumpang(event) {
+    event.preventDefault();
+    const form = event.target;
+    const penumpangBaru = Object.fromEntries(new FormData(form).entries());
+    const penumpangTersimpan = JSON.parse(localStorage.getItem('savedPassengers')) || [];
+    penumpangTersimpan.push(penumpangBaru);
+    localStorage.setItem('savedPassengers', JSON.stringify(penumpangTersimpan));
+    showNotification('Penumpang berhasil disimpan!');
+    renderDaftarPenumpang();
+}
+function hapusPenumpang(index) {
+    const penumpangTersimpan = JSON.parse(localStorage.getItem('savedPassengers')) || [];
+    penumpangTersimpan.splice(index, 1);
+    localStorage.setItem('savedPassengers', JSON.stringify(penumpangTersimpan));
+    showNotification('Penumpang berhasil dihapus!');
+    renderDaftarPenumpang();
+}
+function setupAutocomplete(input, dataArray) {
+    if (!dataArray || !input) return;
+    const suggestionsContainer = input.nextElementSibling;
+    if (!suggestionsContainer) {
+        console.error("Elemen untuk saran autocomplete tidak ditemukan di sebelah input:", input);
+        return;
+    }
+    input.addEventListener('input', function() {
+        const value = this.value.toLowerCase();
+        suggestionsContainer.innerHTML = '';
+        if (!value) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+        const filteredData = dataArray
+            .filter(item => item.toLowerCase().includes(value))
+            .slice(0, 5);
+        if (filteredData.length > 0) {
+            suggestionsContainer.style.display = 'block';
+            filteredData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'p-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer';
+                div.innerHTML = item.replace(new RegExp(value, 'gi'), (match) => `<strong>${match}</strong>`);
+                div.addEventListener('click', () => {
+                    input.value = item;
+                    suggestionsContainer.style.display = 'none';
+                    suggestionsContainer.innerHTML = '';
+                });
+                suggestionsContainer.appendChild(div);
+            });
+        } else {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+    document.addEventListener('click', (e) => {
+        if (e.target !== input) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+}
+function toggleNotifications() {
+    const isEnabled = document.getElementById('notifToggle').checked;
+    localStorage.setItem('notificationsEnabled', isEnabled);
+    showNotification(`Notifikasi Promo ${isEnabled ? 'diaktifkan' : 'dinonaktifkan'}.`);
+}
+function applyTheme() {
+    const theme = localStorage.getItem('theme') || 'system';
+    if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+}
+function handleLogout() {
+    showLoading('Keluar dari akun...');
+    if (window.handleClerkLogout) {
+        window.handleClerkLogout();
+    }
+    setTimeout(() => {
+        localStorage.clear();
+        navigationStack = [];
+        activeBookingData = {};
+        renderSaldo();
+        setActiveNav('homepage', true);
+        if (window.updateUserUI) {
+            window.updateUserUI();
+        }
+        hideLoading();
+    }, 1500);
+}
+function renderPenerjemah() {
+    const container = document.getElementById('penerjemah');
+    if (!container) return;
+    updateHeader('penerjemah');
+    container.innerHTML = `<div class="form-section"><h2 class="text-xl font-bold mb-4 text-center">Penerjemah AI</h2><div class="space-y-4"><div><label class="block text-sm font-medium text-muted mb-1">Teks</label><textarea id="translatorInput" class="modern-input" rows="3" placeholder="Masukkan teks..."></textarea></div><div><label class="block text-sm font-medium text-muted mb-1">Terjemahkan ke Bahasa</label><select id="translatorLang" class="modern-select"><option value="English">Inggris</option><option value="Japanese">Jepang</option><option value="Arabic">Arab</option><option value="Korean">Korea</option></select></div><button onclick="handleTranslate()" class="btn-primary w-full">Terjemahkan</button><div><label class="block text-sm font-medium text-muted mb-1">Hasil</label><div id="translatorOutput" class="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-lg min-h-[50px]"></div></div></div></div>`;
+}
+async function handleTranslate() {
+    const input = document.getElementById('translatorInput')?.value;
+    const lang = document.getElementById('translatorLang')?.value;
+    const output = document.getElementById('translatorOutput');
+    if (!output) return;
+    if (!input) {
+        output.textContent = "Masukkan teks terlebih dahulu.";
+        return;
+    }
+    showLoading('Menerjemahkan...');
+    try {
+        const response = await getTranslation(input, lang);
+        output.textContent = response;
+    } catch (error) {
+        output.textContent = "Gagal menerjemahkan.";
+    } finally {
+        hideLoading();
+    }
+}
+function renderAiPlannerForm() {
+    const container = document.getElementById('ai-planner');
+    if (!container) return;
+    updateHeader('ai-planner');
+    container.innerHTML = `<div class="form-section"><div class="text-center mb-6"><i class="fas fa-magic text-5xl text-fuchsia-400 mb-3"></i><h2 class="text-2xl font-bold">Perencana Perjalanan AI</h2><p class="text-muted">Biarkan AI merancang liburan impian Anda!</p></div><form id="aiPlannerForm" onsubmit="event.preventDefault(); handleAiPlannerSubmit()" class="space-y-4"><div><label class="block text-sm font-medium text-muted mb-1">Tujuan Kota</label><input type="text" name="destination" class="modern-input" placeholder="Contoh: Surabaya" required></div><div><label class="block text-sm font-medium text-muted mb-1">Lama Perjalanan (hari)</label><input type="number" name="duration" class="modern-input" placeholder="Contoh: 3" min="1" required></div><div><label class="block text-sm font-medium text-muted mb-1">Minat Anda</label><div class="grid grid-cols-2 gap-2 text-sm"><label class="flex items-center p-2 border dark:border-gray-600 rounded-lg"><input type="checkbox" name="interests" value="Kuliner" class="mr-2 accent-fuchsia-500">Kuliner</label><label class="flex items-center p-2 border dark:border-gray-600 rounded-lg"><input type="checkbox" name="interests" value="Alam" class="mr-2 accent-fuchsia-500">Alam</label><label class="flex items-center p-2 border dark:border-gray-600 rounded-lg"><input type="checkbox" name="interests" value="Sejarah" class="mr-2 accent-fuchsia-500">Sejarah</label><label class="flex items-center p-2 border dark:border-gray-600 rounded-lg"><input type="checkbox" name="interests" value="Belanja" class="mr-2 accent-fuchsia-500">Belanja</label></div></div><button type="submit" class="btn-primary w-full !mt-6"><i class="fas fa-cogs mr-2"></i>Buatkan Rencana</button></form></div><div id="itineraryResult" class="p-4 mt-6"></div>`;
+}
+async function handleAiPlannerSubmit() {
+    const form = document.getElementById('aiPlannerForm');
+    const resultContainer = document.getElementById('itineraryResult');
+    if (!form || !resultContainer) return;
+    const destination = form.destination.value;
+    const duration = form.duration.value;
+    const interests = Array.from(form.querySelectorAll('input[name="interests"]:checked')).map(cb => cb.value);
+    showLoading('AI sedang meracik rencana...');
+    resultContainer.innerHTML = '';
+    try {
+        const response = await getAiPlannerResponse(destination, duration, interests);
+        resultContainer.innerHTML = `<div class="form-section prose dark:prose-invert max-w-none">${response}</div>`;
+    } catch (error) {
+        resultContainer.innerHTML = `<div class="form-section text-center text-red-500">Gagal membuat rencana. Periksa API Key atau coba lagi.</div>`;
+    } finally {
+        hideLoading();
+    }
+    
+}
+
+
+window.addEventListener('load', async () => {
+    // --- Bagian 1: Logika Splash Screen & Modal Promo ---
+    const splashScreen = document.getElementById('splash-screen');
+    const promoModal = document.getElementById('promo-modal-overlay');
+
+    const initializeApp = () => {
+        if (typeof setActiveNav === 'function') {
+            setActiveNav('homepage', true);
+        }
+    };
+
+    if (splashScreen && promoModal) {
+        const modalContent = promoModal.querySelector('.animate__animated');
+        const closeBtn = document.getElementById('close-promo-btn');
+        const continueBtn = document.getElementById('continue-app-btn');
+
+        const showPromoModal = () => {
+            promoModal.style.display = 'flex';
+            setTimeout(() => {
+                promoModal.style.opacity = '1';
+                if (modalContent) {
+                    modalContent.classList.remove('animate__fadeOutDown');
+                    modalContent.classList.add('animate__fadeInUp');
+                }
+            }, 10);
+        };
+
+        const hidePromoModal = () => {
+            if (modalContent) {
+                modalContent.classList.remove('animate__fadeInUp');
+                modalContent.classList.add('animate__fadeOutDown');
+            }
+            promoModal.style.opacity = '0';
+            promoModal.addEventListener('transitionend', () => {
+                promoModal.style.display = 'none';
+                initializeApp(); // Panggil inisialisasi setelah modal ditutup
+            }, { once: true });
+        };
+
+        setTimeout(() => {
+            splashScreen.style.opacity = '0';
+            splashScreen.addEventListener('transitionend', () => {
+                splashScreen.remove();
+                showPromoModal();
+            }, { once: true });
+        }, 2000);
+
+        closeBtn.addEventListener('click', hidePromoModal);
+        continueBtn.addEventListener('click', hidePromoModal);
+    } else {
+        console.warn("Elemen #splash-screen atau #promo-modal-overlay tidak ditemukan. Melanjutkan ke aplikasi.");
+        initializeApp(); // Langsung inisialisasi jika splash/modal tidak ada
+    }
+
+    // --- Bagian 2: Logika Otentikasi Clerk JS (Tidak ada perubahan di sini) ---
+    if (window.Clerk) {
+        const clerk = window.Clerk;
+        await clerk.load();
+        
+        // ... sisa kode Clerk JS Anda tetap sama ...
+        
+        window.openLoginModal = () => clerk.openSignIn();
+        window.handleClerkLogout = () => clerk.signOut();
+
+        window.updateUserUI = () => {
+            const headerLeft = document.getElementById('header-left');
+            const logoutContainer = document.getElementById('logoutButtonContainer');
+            if (clerk.user) {
+                const localProfile = JSON.parse(localStorage.getItem('userProfile'));
+                const profileImageUrl = localProfile?.profilePic || clerk.user.imageUrl;
+                const fullName = localProfile?.fullName || clerk.user.fullName || "Pengguna";
+
+                document.getElementById('sideMenuProfilePic').src = profileImageUrl;
+                document.getElementById('sideMenuFullName').textContent = fullName;
+                document.getElementById('sideMenuEmail').textContent = clerk.user.primaryEmailAddress.emailAddress;
+                logoutContainer.innerHTML = `<button onclick="handleLogout()" class="side-menu-item w-full bg-red-500 hover:bg-red-600"><i class="fas fa-sign-out-alt"></i><span>Keluar</span></button>`;
+
+                if (navigationStack.length === 0 && headerLeft) {
+                    headerLeft.innerHTML = `<img src="${profileImageUrl}" class="w-8 h-8 rounded-full cursor-pointer object-cover" onclick="openMenu()">`;
+                }
+            } else {
+                document.getElementById('sideMenuProfilePic').src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+                document.getElementById('sideMenuFullName').textContent = 'Pengguna A-GIN';
+                document.getElementById('sideMenuEmail').textContent = 'email@anda.com';
+                logoutContainer.innerHTML = '';
+
+                if (navigationStack.length === 0 && headerLeft) {
+                    headerLeft.innerHTML = `<button onclick="openLoginModal()" aria-label="Login atau Daftar" class="text-2xl w-8 text-center"><i class="fas fa-user-circle"></i></button>`;
+                }
+            }
+        };
+
+        window.handleProtectedAction = (callback) => {
+            if (clerk.user) {
+                if (callback && typeof callback === 'function') callback();
+            } else {
+                openLoginModal();
+            }
+        };
+
+        clerk.addListener(updateUserUI);
+        updateUserUI();
+    }
+});
