@@ -1,0 +1,737 @@
+// --- DATA MASTER UNTUK DLU FERRY (VERSI LENGKAP) ---
+const DLU_DATA = {
+    passengerClasses: [
+        { id: 'VIP', name: 'VIP', priceMultiplier: 4.0, description: 'Kamar pribadi untuk 2 orang, dilengkapi AC, TV, dan kamar mandi dalam.' },
+        { id: 'KL1', name: 'Kelas I', priceMultiplier: 3.0, description: 'Kamar untuk 2-4 orang, dilengkapi AC dan TV. Kamar mandi terkadang di dalam.' },
+        { id: 'KL2', name: 'Kelas II', priceMultiplier: 2.2, description: 'Kamar untuk 4-8 orang dengan tempat tidur susun (bunk bed) dan AC.' },
+        { id: 'KL3', name: 'Kelas III', priceMultiplier: 1.8, description: 'Kabin besar berisi puluhan tempat tidur susun, dilengkapi AC.' },
+        { id: 'EKO_T', name: 'Ekonomi Tidur', priceMultiplier: 1.2, description: 'Ruangan besar (barak) dengan banyak kasur/matras. Non-AC, menggunakan kipas.' },
+        { id: 'EKO_D', name: 'Ekonomi Duduk', priceMultiplier: 1.0, description: 'Area dengan kursi seperti di pesawat/kereta. Harga paling terjangkau.' },
+        { id: 'DEK', name: 'Ekonomi Non-Seat (Dek)', priceMultiplier: 0.9, description: 'Area dek terbuka tanpa kursi/kasur khusus. Penumpang bebas mencari tempat.' }
+    ],
+    vehicleClasses: [
+        { golongan: 'GOL_I', name: 'Golongan I - Sepeda', description: 'Sepeda kayuh.', price: 75000 },
+        { golongan: 'GOL_II', name: 'Golongan II - Motor < 500cc', description: 'Motor matic, bebek, sport.', price: 320000 },
+        { golongan: 'GOL_III', name: 'Golongan III - Motor > 500cc', description: 'Motor besar (moge) dan roda tiga.', price: 550000 },
+        { golongan: 'GOL_IVA', name: 'Golongan IV A - Mobil Penumpang', description: 'Mobil Sedan, MPV, SUV (panjang < 5m).', price: 1850000 },
+        { golongan: 'GOL_IVB', name: 'Golongan IV B - Mobil Barang', description: 'Mobil Pick Up, Box (panjang < 5m).', price: 1650000 },
+        { golongan: 'GOL_VA', name: 'Golongan V A - Bus Sedang', description: 'Bus penumpang (panjang < 7m).', price: 3700000 },
+        { golongan: 'GOL_VB', name: 'Golongan V B - Truk Sedang', description: 'Truk barang (panjang < 7m).', price: 3100000 },
+        { golongan: 'GOL_VIA', name: 'Golongan VI A - Bus Besar', description: 'Bus penumpang (panjang < 10m).', price: 5800000 },
+        { golongan: 'GOL_VIB', name: 'Golongan VI B - Truk Besar', description: 'Truk tronton (panjang < 10m).', price: 5150000 },
+        { golongan: 'GOL_VII', name: 'Golongan VII - Truk Trailer', description: 'Truk gandeng (panjang < 12m).', price: 6500000 },
+        { golongan: 'GOL_VIII', name: 'Golongan VIII - Truk Trailer', description: 'Truk gandeng (panjang < 16m).', price: 9200000 },
+        { golongan: 'GOL_IX', name: 'Golongan IX - Truk Trailer', description: 'Truk gandeng (panjang > 16m).', price: 13500000 }
+    ],
+    infantFee: 75000
+};
+
+// Variabel global untuk menampung hasil pencarian
+let currentHotelResults = [];
+let currentSearchResults = [];
+
+// --- FUNGSI HELPER ---
+function getRandomItems(arr, n) {
+    if (!arr || arr.length === 0) return [];
+    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, n);
+}
+
+// --- GANTI FUNGSI LAMA ANDA DENGAN KODE DI BAWAH INI ---
+
+function renderBookingForm(type) {
+    const container = document.getElementById(type);
+    if (!container) return;
+
+    // Reset jumlah penumpang
+    passengerCounts = { adult: 1, child: 0, infant: 0 };
+
+    // =================================================================
+    // KONDISI KHUSUS UNTUK FORMULIR PESAWAT
+    // =================================================================
+    if (type === 'pesawat') {
+        const today = new Date().toISOString().split('T')[0];
+        
+        container.innerHTML = `
+        <div class="p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center">
+                        <i class="fas fa-plane mr-2 text-gray-500"></i>Cari Tiket Pesawat
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Pergi-Pulang</span>
+                        <label for="round-trip-toggle" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="round-trip-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <form id="pesawatForm" onsubmit="event.preventDefault(); search(event, 'pesawat');">
+                    <div class="space-y-4">
+                         <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-plane-departure mr-2"></i>Dari</label><div class="relative"><input type="text" name="from" placeholder="Kota atau bandara asal" class="modern-input" autocomplete="off" required><div class="autocomplete-suggestions"></div></div></div>
+                         <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-plane-arrival mr-2"></i>Ke</label><div class="relative"><input type="text" name="to" placeholder="Kota atau bandara tujuan" class="modern-input" autocomplete="off" required><div class="autocomplete-suggestions"></div></div></div>
+                         <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-calendar-alt mr-2"></i>Tanggal Berangkat</label><input type="date" name="departDate" class="modern-input" required min="${today}"></div>
+                         
+                         <div id="return-date-container" class="hidden">
+                            <label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-calendar-alt mr-2"></i>Tanggal Pulang</label>
+                            <input type="date" name="returnDate" class="modern-input" min="${today}">
+                         </div>
+
+                         <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-users mr-2"></i>Penumpang</label><div class="modern-input cursor-pointer flex justify-between items-center" onclick="openModal('passengerModal')"><span id="pesawatPassengerText">1 Dewasa</span><i class="fas fa-chevron-down text-gray-400"></i></div></div>
+                    </div>
+                    <button type="submit" class="btn-primary w-full mt-6"><i class="fas fa-search mr-2"></i>Cari Tiket</button>
+                </form>
+            </div>
+        </div>
+        `;
+
+        // Setel listener KHUSUS untuk form pesawat setelah HTML dirender
+        setupFlightFormListeners();
+        setupAutocomplete(container.querySelector('input[name="from"]'), DB.airports);
+        setupAutocomplete(container.querySelector('input[name="to"]'), DB.airports);
+        container.querySelector('input[name="departDate"]').value = today;
+
+    // =================================================================
+    // FORMULIR GENERIK UNTUK TIPE LAIN (KERETA, PELNI, FERRY)
+    // =================================================================
+    } else {
+        const dataKeys = {
+            kereta: "trainStations",
+            pelni: "seaPorts",
+            ferry: "dluPorts",
+            bus: "busTerminals"
+        };
+        const fromPlaceholder = type === 'bus' ? 'Terminal asal' : (type === 'kereta' ? 'Stasiun asal' : 'Lokasi asal');
+        const toPlaceholder = type === 'bus' ? 'Terminal tujuan' : (type === 'kereta' ? 'Stasiun tujuan' : 'Lokasi tujuan');
+
+        container.innerHTML = `
+        <div class="form-section">
+            <h2 class="text-xl font-bold mb-6"><i class="fas fa-ticket-alt mr-2"></i>Cari Tiket ${type.charAt(0).toUpperCase() + type.slice(1)}</h2>
+            <form id="${type}Form" onsubmit="event.preventDefault(); search(event, '${type}')">
+                <div class="space-y-4">
+                    <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-map-marker-alt mr-2"></i>Dari</label><div class="relative"><input type="text" name="from" placeholder="${fromPlaceholder}" class="modern-input" autocomplete="off" required><div class="autocomplete-suggestions"></div></div></div>
+                    <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-map-marker-alt mr-2"></i>Ke</label><div class="relative"><input type="text" name="to" placeholder="${toPlaceholder}" class="modern-input" autocomplete="off" required><div class="autocomplete-suggestions"></div></div></div>
+                    <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-calendar-alt mr-2"></i>Tanggal Berangkat</label><input type="date" name="departDate" class="modern-input" required></div>
+                    <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-users mr-2"></i>Penumpang</label><div class="modern-input cursor-pointer flex justify-between items-center" onclick="openModal('passengerModal')"><span id="${type}PassengerText">1 Dewasa</span><i class="fas fa-chevron-down text-gray-400"></i></div></div>
+                </div>
+                <button type="submit" class="btn-primary w-full mt-6"><i class="fas fa-search mr-2"></i>Cari Tiket</button>
+            </form>
+        </div>`;
+
+        setupAutocomplete(container.querySelector('input[name="from"]'), DB[dataKeys[type]]);
+        setupAutocomplete(container.querySelector('input[name="to"]'), DB[dataKeys[type]]);
+        
+        const departDateInput = container.querySelector('input[name="departDate"]');
+        if (departDateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            departDateInput.setAttribute('min', today);
+            departDateInput.value = today;
+        }
+
+        if (type === 'ferry') {
+            renderFerryOptions(container);
+        }
+    }
+}
+
+// Fungsi ini SEKARANG hanya untuk form pesawat
+function setupFlightFormListeners() {
+    const roundTripToggle = document.getElementById('round-trip-toggle');
+    const returnDateContainer = document.getElementById('return-date-container');
+    const returnDateInput = document.querySelector('input[name="returnDate"]');
+
+    if (roundTripToggle && returnDateContainer && returnDateInput) {
+        roundTripToggle.addEventListener('change', (event) => {
+            const isChecked = event.target.checked;
+            // Tampilkan/sembunyikan kontainer tanggal pulang
+            returnDateContainer.classList.toggle('hidden', !isChecked);
+            // Jadikan input wajib diisi jika Pergi-Pulang
+            returnDateInput.required = isChecked;
+        });
+    }
+}
+// --- FUNGSI AUTOCOMPLETE ---
+function setupAutocomplete(inputElement, dataArray) {
+    const suggestionsContainer = inputElement.parentElement.querySelector('.autocomplete-suggestions');
+    inputElement.addEventListener('input', () => {
+        const value = inputElement.value.toLowerCase().trim();
+        suggestionsContainer.innerHTML = '';
+        if (value.length > 0) {
+            const filteredData = dataArray
+                .filter(item => item.toLowerCase().includes(value))
+                .slice(0, 6);
+            if (filteredData.length > 0) {
+                filteredData.forEach(item => {
+                    const suggestionDiv = document.createElement('div');
+                    suggestionDiv.textContent = item;
+                    suggestionDiv.classList.add('suggestion-item');
+                    suggestionDiv.addEventListener('click', () => {
+                        inputElement.value = item;
+                        suggestionsContainer.innerHTML = '';
+                    });
+                    suggestionsContainer.appendChild(suggestionDiv);
+                });
+            }
+        }
+    });
+    document.addEventListener('click', (e) => {
+        if (!inputElement.parentElement.contains(e.target)) {
+            suggestionsContainer.innerHTML = '';
+        }
+    });
+}
+
+// --- FUNGSI-FUNGSI TERKAIT FERRY ---
+function renderFerryOptions(container) {
+    const passengerInput = container.querySelector(`[onclick="openModal('passengerModal')"]`);
+    if (!passengerInput) {
+        console.error("Elemen input penumpang tidak ditemukan untuk menambahkan opsi ferry.");
+        return;
+    }
+    const passengerDiv = passengerInput.parentElement;
+    const vehicleOptionsHTML = `
+        <div class="mt-4">
+            <div class="flex items-center justify-between">
+                <label for="withVehicle" class="text-sm font-medium text-muted">
+                    <i class="fas fa-car mr-2"></i>Bawa Kendaraan?
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="withVehicle" onchange="toggleVehicleSelect(this.checked)">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div id="vehicleSelection" class="mt-2 hidden">
+                <select name="vehicleClass" class="modern-select">
+                    <option value="" disabled selected>Pilih Golongan Kendaraan</option>
+                    ${DLU_DATA.vehicleClasses.map(v => `<option value="${v.golongan}">${v.name}</option>`).join('')}
+                </select>
+            </div>
+        </div>`;
+    passengerDiv.insertAdjacentHTML('afterend', vehicleOptionsHTML);
+}
+function toggleVehicleSelect(isChecked) {
+    const vehicleDiv = document.getElementById('vehicleSelection');
+    if (isChecked) {
+        vehicleDiv.classList.remove('hidden');
+        vehicleDiv.querySelector('select').setAttribute('required', 'true');
+    } else {
+        vehicleDiv.classList.add('hidden');
+        vehicleDiv.querySelector('select').removeAttribute('required');
+        vehicleDiv.querySelector('select').value = "";
+    }
+}
+
+// --- PROSES PENCARIAN & HASIL ---
+function search(event, type) {
+    const form = event.target;
+    const formData = new FormData(form);
+    activeBookingData = {
+        type,
+        from: formData.get('from'),
+        to: formData.get('to'),
+        departDate: formData.get('departDate'),
+        passengers: { ...passengerCounts },
+        vehicleClass: formData.get('vehicleClass') || null
+    };
+    if (!activeBookingData.from || !activeBookingData.to) {
+        showNotification('Mohon lengkapi data pencarian');
+        return;
+    }
+    saveStateAndProceed(type, renderResults, type, activeBookingData);
+}
+function renderResults(type, searchParams) {
+    const container = document.getElementById(type);
+    if (!container) return;
+    showLoading('Mencari perjalanan terbaik...');
+    container.innerHTML = '';
+    updateHeader(type, "Hasil Pencarian");
+    setTimeout(() => {
+        currentSearchResults = generateDummyResults(type);
+        if (currentSearchResults.length === 0) {
+            container.innerHTML = `<div class="p-4 text-center text-muted">Tidak ada hasil ditemukan.</div>`;
+            hideLoading();
+            return;
+        }
+        const resultsHTML = currentSearchResults.map((r, index) => {
+            const clickAction = `selectResult(${index})`;
+            return `
+                <div class="flight-result-card" onclick="${clickAction}">
+                    <div class="flight-result-card__airline">
+                        <p class="airline__name">${r.name}</p>
+                        <p class="airline__details">${r.time} &bull; ${r.duration}</p>
+                    </div>
+                    <div class="flight-result-card__route"><span class="route__dot"></span></div>
+                    <div class="flight-result-card__price">
+                        <p class="price__amount">Rp ${r.price.toLocaleString('id-ID')}</p>
+                        <p class="price__per-person">/org</p>
+                    </div>
+                </div>`;
+        }).join('');
+        container.innerHTML = `
+            <div class="form-section !p-0 !bg-transparent !border-none !shadow-none">
+                <h3 class="text-lg font-bold mb-4">Hasil: ${searchParams.from.split(',')[0]} → ${searchParams.to.split(',')[0]}</h3>
+                <div class="search-results-container">${resultsHTML}</div>
+            </div>`;
+        hideLoading();
+    }, 1500);
+}
+function generateDummyResults(type) {
+    const icons = { pesawat: "fa-plane", kereta: "fa-train", pelni: "fa-ship", ferry: "fa-ferry", bus: "fa-bus" };
+    let names = [];
+    switch (type) {
+        case 'pesawat': names = getRandomItems(DB.airlines, 4); break;
+        case 'kereta': names = ["Argo Bromo", "Bima", "Taksaka"]; break;
+        case 'pelni': names = getRandomItems(DB.pelniShips, 3); break;
+        case 'ferry': names = getRandomItems(DB.dluFerries, 3); break;
+        case 'bus': names = getRandomItems(DB.busOperators, 3); break;
+        default: names = ["Contoh A", "Contoh B", "Contoh C"];
+    }
+    if (names.length === 0) return [];
+    return names.map((name, i) => ({
+        type,
+        icon: icons[type],
+        name,
+        time: `${String(6 + i * 2).padStart(2, '0')}:30`,
+        duration: `${i + 4}j ${i * 15}m`,
+        price: 95000 + (i * 25000) + Math.floor(Math.random() * 20000)
+    }));
+}
+
+// --- PROSES PEMESANAN (BOOKING) ---
+function selectResult(index) {
+    const selection = currentSearchResults[index];
+    if (!selection) {
+        console.error("Hasil pencarian tidak valid untuk indeks:", index);
+        return;
+    }
+    if (selection.type === 'ferry') {
+        saveStateAndProceed(selection.type, renderFerryClassSelection, selection);
+    } else {
+        selectTicket(selection);
+    }
+}
+
+// [MODIFIKASI 1 dari 3]
+function selectTicket(selection) {
+    activeBookingData.selectedTicket = selection;
+    // Gunakan penjaga login sebelum melanjutkan
+    requireLoginForAction(() => {
+        saveStateAndProceed(activeBookingData.type, renderBookerDetailsForm);
+    });
+}
+
+function renderFerryClassSelection(selection) {
+    activeBookingData.selectedTicket = selection;
+    const { type } = activeBookingData;
+    const container = document.getElementById(type);
+    if (!container) return;
+    updateHeader(type, "Pilih Kelas Penumpang");
+    const classOptionsHTML = DLU_DATA.passengerClasses.map((pClass, index) => {
+        const price = selection.price * pClass.priceMultiplier;
+        return `
+            <label for="${pClass.id}" class="flex items-start justify-between p-3 border rounded-lg cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700">
+                <div class="flex-grow mr-4">
+                    <p class="font-semibold">${pClass.name}</p>
+                    <p class="text-xs text-muted mt-1">${pClass.description}</p>
+                    <p class="text-sm text-blue-600 font-bold mt-2">Rp ${price.toLocaleString('id-ID')} /org</p>
+                </div>
+                <input type="radio" id="${pClass.id}" name="passengerClass" value="${pClass.id}" ${index === 0 ? 'checked' : ''} required class="form-radio h-5 w-5 text-blue-600 mt-1">
+            </label>`;
+    }).join('');
+    container.innerHTML = `
+        <div class="form-section">
+            <div class="text-center border-b pb-4 mb-4">
+                <h2 class="text-xl font-bold">${selection.name}</h2>
+                <p class="text-muted">${activeBookingData.from.split(',')[0]} → ${activeBookingData.to.split(',')[0]}</p>
+            </div>
+            <form id="classSelectionForm" onsubmit="event.preventDefault(); selectPassengerClass(event)">
+                <h3 class="font-bold mb-3"><i class="fas fa-couch mr-2"></i>Pilih Kelas</h3>
+                <div class="space-y-3 mb-6">${classOptionsHTML}</div>
+                <button type="submit" class="btn-primary w-full"><i class="fas fa-arrow-right mr-2"></i>Lanjutkan</button>
+            </form>
+        </div>`;
+}
+
+// [MODIFIKASI 2 dari 3]
+function selectPassengerClass(event) {
+    const formData = new FormData(event.target);
+    const selectedClassId = formData.get('passengerClass');
+    const selectedClassDetails = DLU_DATA.passengerClasses.find(c => c.id === selectedClassId);
+    activeBookingData.selectedPassengerClass = selectedClassDetails;
+    activeBookingData.selectedTicket.finalPricePerPerson = activeBookingData.selectedTicket.price * selectedClassDetails.priceMultiplier;
+    // Gunakan penjaga login sebelum melanjutkan
+    requireLoginForAction(() => {
+        saveStateAndProceed(activeBookingData.type, renderBookerDetailsForm);
+    });
+}
+
+function renderBookerDetailsForm() {
+    const { type } = activeBookingData;
+    const container = document.getElementById(type);
+    if (!container) return;
+    updateHeader(type, "Detail Pemesan");
+    container.innerHTML = `
+        <div class="form-section">
+            <h2 class="text-xl font-bold mb-6"><i class="fas fa-user-edit mr-2"></i>Isi Data Pemesan</h2>
+            <form id="bookerForm" onsubmit="event.preventDefault(); processBooking(event)">
+                <div class="space-y-4">
+                    <div><label class="block text-sm font-medium text-muted mb-1">Panggilan</label><select name="gender" class="modern-select" required><option value="Tuan">Tuan</option><option value="Nyonya">Nyonya</option><option value="Nona">Nona</option></select></div>
+                    <div><label class="block text-sm font-medium text-muted mb-1">Nama Lengkap (sesuai KTP)</label><input type="text" name="fullName" placeholder="Nama Lengkap Anda" class="modern-input" required></div>
+                    <div><label class="block text-sm font-medium text-muted mb-1">Tipe & No. Identitas</label><div class="grid grid-cols-2 gap-2"><select name="idType" class="modern-select" required><option value="KTP">KTP</option><option value="PASPOR">PASPOR</option></select><input type="text" name="idNumber" class="modern-input" placeholder="Nomor Identitas" required></div></div>
+                    <div><label class="block text-sm font-medium text-muted mb-1">No. WhatsApp</label><input type="tel" name="phone" placeholder="08123456789" class="modern-input" required></div>
+                    <div><label class="block text-sm font-medium text-muted mb-1">Email</label><input type="email" name="email" placeholder="email@contoh.com" class="modern-input" required></div>
+                </div>
+                <button type="submit" class="btn-primary w-full mt-6"><i class="fas fa-arrow-right mr-2"></i>Lanjutkan ke Pembayaran</button>
+            </form>
+        </div>`;
+}
+function processBooking(event) {
+    const { type } = activeBookingData;
+    const form = event.target;
+    const formData = new FormData(form);
+    activeBookingData.bookerDetails = Object.fromEntries(formData.entries());
+    if (Object.values(activeBookingData.bookerDetails).some(val => !val)) {
+        showNotification(`Mohon isi semua data diri.`);
+        return;
+    }
+    saveStateAndProceed(type, showPaymentSuccess, 'AGT' + Date.now().toString().slice(-8));
+}
+function showPaymentSuccess(bookingId) {
+    const { type } = activeBookingData;
+    const container = document.getElementById(type);
+    if (!container) return;
+    updateHeader(type, "Pembayaran Berhasil");
+    const { selectedTicket, passengers, from, to, departDate, vehicleClass, selectedPassengerClass } = activeBookingData;
+    const operatorLabel = type === 'pesawat' ? 'Maskapai' : (type === 'bus' ? 'Operator Bus' : 'Kapal');
+    let totalPrice = 0;
+    let priceDetailsHTML = '';
+    if (type === 'ferry') {
+        const pricePerPerson = selectedTicket.finalPricePerPerson || (selectedTicket.price * selectedPassengerClass.priceMultiplier);
+        const passengerPrice = pricePerPerson * (passengers.adult + passengers.child);
+        const infantPrice = DLU_DATA.infantFee * passengers.infant;
+        const vehicleData = vehicleClass ? DLU_DATA.vehicleClasses.find(v => v.golongan === vehicleClass) : null;
+        const vehiclePrice = vehicleData ? vehicleData.price : 0;
+        totalPrice = passengerPrice + infantPrice + vehiclePrice;
+        priceDetailsHTML = `
+            <p><strong><i class="fas fa-users"></i> Penumpang:</strong> ${passengers.adult} Dewasa, ${passengers.child} Anak, ${passengers.infant} Bayi</p>
+            <p><strong><i class="fas fa-couch"></i> Kelas:</strong> ${selectedPassengerClass.name}</p>
+            ${vehicleData ? `<p><strong><i class="fas fa-car"></i> Kendaraan:</strong> ${vehicleData.name}</p>` : ''}
+            <p class="mt-2 pt-2 border-t font-bold">
+                <strong><i class="fas fa-money-bill-wave"></i> Total:</strong> Rp ${totalPrice.toLocaleString('id-ID')}
+            </p>`;
+    } else {
+        const totalPassengers = passengers.adult + passengers.child;
+        totalPrice = selectedTicket.price * totalPassengers;
+        priceDetailsHTML = `
+            <p><strong><i class="fas fa-users"></i> Penumpang:</strong> ${totalPassengers} orang</p>
+            <p class="mt-2 pt-2 border-t font-bold">
+                <strong><i class="fas fa-money-bill-wave"></i> Total:</strong> Rp ${totalPrice.toLocaleString('id-ID')}
+            </p>`;
+    }
+    container.innerHTML = `
+        <div class="form-section text-center">
+            <div class="text-green-500 text-6xl mb-4"><i class="fas fa-check-circle"></i></div>
+            <h3 class="text-xl font-bold text-green-600 mb-2">Pembayaran Berhasil!</h3>
+            <p class="text-muted mb-4">E-tiket Anda akan dikirim ke email.</p>
+            <div class="border rounded-lg p-4 mb-4 bg-green-50 dark:bg-gray-700 text-left dark:text-white">
+                <p><strong><i class="fas fa-receipt"></i> Kode Booking:</strong> ${bookingId}</p>
+                <p><strong><i class="fas fa-route"></i> Rute:</strong> ${from} → ${to}</p>
+                <p><strong><i class="fas ${selectedTicket.icon}"></i> ${operatorLabel}:</strong> ${selectedTicket.name}</p>
+                <p><strong><i class="fas fa-calendar-alt"></i> Tanggal:</strong> ${departDate}</p>
+                ${priceDetailsHTML}
+                <div class="border-t pt-2 mt-2">
+                    <p><strong><i class="fas fa-user"></i> Pemesan:</strong> ${activeBookingData.bookerDetails.gender}. ${activeBookingData.bookerDetails.fullName}</p>
+                    <p><strong><i class="fas fa-id-card"></i> Identitas:</strong> ${activeBookingData.bookerDetails.idType} - ${activeBookingData.bookerDetails.idNumber}</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <button onclick="showNotification('Fitur segera hadir!')" class="btn-primary w-full"><i class="fas fa-download mr-2"></i>Download E-Tiket</button>
+                <button onclick="setActiveNav('homepage', true)" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"><i class="fas fa-home mr-2"></i>Kembali ke Beranda</button>
+            </div>
+        </div>`;
+    hideLoading();
+    activeBookingData = {};
+    navigationStack = [];
+}
+
+// =========================================================================
+// === FUNGSI FITUR HOTEL (KODE BARU YANG LEBIH STABIL) ===
+// =========================================================================
+function renderHotelBookingForm() {
+    const container = document.getElementById('hotel');
+    if (!container) return;
+    hotelGuestCounts = { adult: 1, child: 0, room: 1 };
+    container.innerHTML = `
+        <div class="form-section">
+            <h2 class="text-xl font-bold mb-6 text-center"><i class="fas fa-hotel mr-2"></i>Cari Hotel</h2>
+            <form id="hotelForm" onsubmit="event.preventDefault(); searchHotel(event);">
+                <div class="space-y-4">
+                    <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-map-marked-alt mr-2"></i>Destinasi</label>
+                        <div class="relative"><input type="text" name="destination" placeholder="Kota atau Nama Hotel" class="modern-input" autocomplete="off" required><div class="autocomplete-suggestions"></div></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-calendar-check mr-2"></i>Check-in</label><input type="date" name="checkIn" class="modern-input" required onchange="updateMinCheckoutDate(this.value)"></div>
+                        <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-calendar-times mr-2"></i>Check-out</label><input type="date" name="checkOut" class="modern-input" required></div>
+                    </div>
+                    <div><label class="block text-sm font-medium text-muted mb-1"><i class="fas fa-users mr-2"></i>Tamu & Kamar</label>
+                        <div class="modern-input cursor-pointer flex justify-between items-center" onclick="openModal('hotelGuestModal')">
+                            <span id="hotelGuestText">1 Dewasa, 1 Kamar</span><i class="fas fa-chevron-down text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary w-full mt-6"><i class="fas fa-search mr-2"></i>Cari Hotel</button>
+            </form>
+        </div>`;
+    setupAutocomplete(container.querySelector('input[name="destination"]'), DB.hotelLocations);
+    const today = new Date().toISOString().split('T')[0];
+    const checkInInput = container.querySelector('input[name="checkIn"]');
+    if (checkInInput) {
+        checkInInput.setAttribute('min', today);
+        checkInInput.value = today;
+        updateMinCheckoutDate(today);
+    }
+}
+function updateMinCheckoutDate(checkinDate) {
+    const checkOutInput = document.querySelector('input[name="checkOut"]');
+    if (!checkOutInput) return;
+    const nextDay = new Date(checkinDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const minCheckOut = nextDay.toISOString().split('T')[0];
+    checkOutInput.setAttribute('min', minCheckOut);
+    if (checkOutInput.value < minCheckOut) checkOutInput.value = minCheckOut;
+}
+function searchHotel(event) {
+    const form = event.target;
+    const formData = new FormData(form);
+    activeBookingData = {
+        type: 'hotel',
+        destination: formData.get('destination'),
+        checkIn: formData.get('checkIn'),
+        checkOut: formData.get('checkOut'),
+        guests: { ...hotelGuestCounts }
+    };
+    if (!activeBookingData.destination) {
+        showNotification('Mohon isi destinasi tujuan.');
+        return;
+    }
+    saveStateAndProceed('hotel', renderHotelResults, activeBookingData);
+}
+function renderHotelResults(searchParams) {
+    const container = document.getElementById('hotel');
+    if (!container) return;
+    showLoading('Mencari hotel terbaik...');
+    container.innerHTML = '';
+    updateHeader('hotel', "Hasil Pencarian Hotel");
+    setTimeout(() => {
+        currentHotelResults = generateDummyHotelResults(searchParams.destination);
+        const resultsHTML = currentHotelResults.map((hotel, index) => {
+            return `
+                <div class="hotel-result-card" onclick="pilihHotel(${index})">
+                    <img src="${hotel.image}" alt="${hotel.name}" class="hotel-image-thumbnail"/>
+                    <div class="hotel-details">
+                        <h4 class="hotel-name">${hotel.name}</h4>
+                        <div class="hotel-rating"><i class="fas fa-star"></i><span>${hotel.rating}</span></div>
+                        <p class="hotel-location">${hotel.location}</p>
+                    </div>
+                    <div class="hotel-price">
+                        <p class="price-amount">Rp ${hotel.price.toLocaleString('id-ID')}</p>
+                        <p class="price-per-night">/malam</p>
+                    </div>
+                </div>`;
+        }).join('');
+        container.innerHTML = `
+            <div class="form-section !p-0 !bg-transparent !border-none !shadow-none">
+                <h3 class="text-lg font-bold mb-4">Hotel di ${searchParams.destination}</h3>
+                <div class="search-results-container">${resultsHTML}</div>
+            </div>
+            <style> .hotel-result-card { cursor: pointer; display: flex; background: var(--bg-secondary); border-radius: 0.75rem; overflow: hidden; margin-bottom: 1rem; box-shadow: var(--shadow-sm); } .hotel-image-thumbnail { width: 120px; height: 120px; object-fit: cover; } .hotel-details { flex-grow: 1; padding: 0.75rem; } .hotel-name { font-weight: 700; } .hotel-rating { display: flex; align-items: center; font-size: 0.8rem; color: #f59e0b; margin: 0.25rem 0; } .hotel-rating span { color: var(--text-muted); margin-left: 0.25rem; } .hotel-location { font-size: 0.75rem; color: var(--text-muted); } .hotel-price { padding: 0.75rem; text-align: right; } .hotel-price .price-amount { font-weight: 700; color: var(--primary-color); } .hotel-price .price-per-night { font-size: 0.7rem; color: var(--text-muted); } </style>`;
+        hideLoading();
+    }, 1500);
+}
+function pilihHotel(index) {
+    const hotel = currentHotelResults[index];
+    if (hotel) {
+        saveStateAndProceed('hotel', renderHotelDetailPage, hotel);
+    }
+}
+function renderHotelDetailPage(hotelData) {
+    const container = document.getElementById('hotel-detail');
+    if (!container) return;
+    activeBookingData.selectedHotel = hotelData;
+    setActiveNav('hotel-detail');
+    updateHeader('hotel-detail', hotelData.name);
+    const thumbnailsHTML = hotelData.imageGallery.map((src) =>
+        `<img src="${src}" alt="Thumbnail" class="h-16 w-full object-cover rounded-md cursor-pointer border-2 border-transparent hover:border-blue-500" onclick="changeMainImage(this, '${src}')">`
+    ).join('');
+    container.innerHTML = `
+        <div>
+            <div class="mb-4">
+                <img id="mainHotelImage" src="${hotelData.imageGallery[0]}" alt="${hotelData.name}" class="w-full h-56 object-cover rounded-lg shadow-lg bg-gray-200 dark:bg-gray-700">
+                <div class="grid grid-cols-5 gap-2 mt-2">${thumbnailsHTML}</div>
+            </div>
+            <div class="px-4 pb-24">
+                <h2 class="text-2xl font-bold">${hotelData.name}</h2>
+                <div class="flex items-center my-2">
+                    <span class="text-yellow-500"><i class="fas fa-star"></i> ${hotelData.rating}</span>
+                    <span class="mx-2 text-gray-300 dark:text-gray-600">•</span>
+                    <span class="text-muted">${hotelData.location}</span>
+                </div>
+                <h3 class="font-semibold mt-6 mb-2 text-lg">Tentang Hotel</h3>
+                <p class="text-muted text-justify">${hotelData.description}</p>
+            </div>
+        </div>
+        <div class="fixed bottom-16 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex justify-between items-center shadow-top">
+            <div>
+                <p class="text-xs text-muted">Mulai dari</p>
+                <p class="font-bold text-lg text-primary">Rp ${hotelData.price.toLocaleString('id-ID')} <span class="text-sm font-normal text-muted">/malam</span></p>
+            </div>
+            <button class="btn-primary" onclick="startHotelBooking()">Pesan Sekarang</button>
+        </div>`;
+    const firstThumbnail = container.querySelector('.grid img');
+    if (firstThumbnail) firstThumbnail.classList.add('border-blue-500');
+}
+function changeMainImage(thumbElement, newSrc) {
+    document.getElementById('mainHotelImage').src = newSrc;
+    document.querySelectorAll('#hotel-detail .grid img').forEach(img => img.classList.remove('border-blue-500'));
+    thumbElement.classList.add('border-blue-500');
+}
+
+// [MODIFIKASI 3 dari 3]
+function startHotelBooking() {
+    if (activeBookingData.selectedHotel) {
+        // Gunakan penjaga login sebelum melanjutkan
+        requireLoginForAction(() => {
+            saveStateAndProceed('hotel-detail', renderHotelBookerDetailsForm);
+        });
+    }
+}
+
+function renderHotelBookerDetailsForm() {
+    const container = document.getElementById('hotel');
+    if (!container) return;
+    updateHeader('hotel', "Detail Tamu & Pesanan");
+    setActiveNav('hotel');
+    const hotelPolicyInfo = `
+        <div class="p-3 mb-4 bg-blue-50 dark:bg-gray-700/50 rounded-lg text-xs text-blue-700 dark:text-blue-300">
+            <i class="fas fa-info-circle mr-2"></i>
+            Waktu check-in standar adalah setelah pukul 14:00 dan check-out sebelum pukul 12:00.
+        </div>`;
+    container.innerHTML = `
+        <div class="form-section">
+            <h2 class="text-xl font-bold mb-2"><i class="fas fa-user-edit mr-2"></i>Isi Data Tamu</h2>
+            <p class="text-muted text-sm mb-4">Pastikan data sesuai dengan kartu identitas (KTP/Paspor/SIM) untuk kelancaran proses check-in.</p>
+            ${hotelPolicyInfo}
+            <form id="hotelBookerForm" onsubmit="event.preventDefault(); processHotelBooking(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-1">Nama Lengkap Tamu</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <select name="gender" class="modern-select col-span-1" required><option>Tuan</option><option>Nyonya</option></select>
+                            <input type="text" name="fullName" placeholder="Nama Lengkap sesuai KTP" class="modern-input col-span-2" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-1">Identitas</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select name="idType" class="modern-select" required><option value="KTP">KTP/NIK</option><option value="PASPOR">PASPOR</option><option value="SIM">SIM</option></select>
+                            <input type="number" name="idNumber" placeholder="Nomor Identitas" class="modern-input" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-1">No. WhatsApp</label>
+                        <input type="tel" name="phone" placeholder="08123456789" class="modern-input" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-1">Email</label>
+                        <input type="email" name="email" placeholder="email@contoh.com" class="modern-input" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary w-full mt-6"><i class="fas fa-arrow-right mr-2"></i>Lanjutkan</button>
+            </form>
+        </div>`;
+}
+function processHotelBooking(event) {
+    const form = event.target;
+    const formData = new FormData(form);
+    activeBookingData.bookerDetails = Object.fromEntries(formData.entries());
+    if (Object.values(activeBookingData.bookerDetails).some(val => !val)) {
+        showNotification(`Mohon isi semua data diri.`);
+        return;
+    }
+    saveStateAndProceed('hotel', showHotelPaymentSuccess, 'AGH' + Date.now().toString().slice(-7));
+}
+function showHotelPaymentSuccess(bookingId) {
+    const container = document.getElementById('hotel');
+    if (!container) return;
+    setActiveNav('hotel');
+    updateHeader('hotel', "Pemesanan Berhasil");
+    const { selectedHotel, checkIn, checkOut, guests, bookerDetails } = activeBookingData;
+    const date1 = new Date(checkIn);
+    const date2 = new Date(checkOut);
+    const diffTime = Math.abs(date2 - date1);
+    const totalNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+    const totalPrice = selectedHotel.price * totalNights * guests.room;
+    container.innerHTML = `
+        <div class="form-section text-center">
+            <div class="text-green-500 text-6xl mb-4"><i class="fas fa-check-circle"></i></div>
+            <h3 class="text-xl font-bold text-green-600 mb-2">Pemesanan Berhasil!</h3>
+            <p class="text-muted mb-4">Voucher hotel akan dikirim ke email & WhatsApp Anda.</p>
+            <div class="border rounded-lg p-4 mb-6 bg-green-50 dark:bg-gray-700 text-left dark:text-white">
+                <p class="font-bold"><strong>Kode Booking:</strong> ${bookingId}</p>
+                <div class="border-t my-3"></div>
+                <h4 class="font-bold text-lg">${selectedHotel.name}</h4>
+                <p class="text-sm text-muted mb-2">${selectedHotel.location}</p>
+                <p><strong><i class="fas fa-calendar-check fa-fw mr-2"></i>Check-in:</strong> ${checkIn}</p>
+                <p><strong><i class="fas fa-calendar-times fa-fw mr-2"></i>Check-out:</strong> ${checkOut}</p>
+                <p><strong><i class="fas fa-moon fa-fw mr-2"></i>Durasi:</strong> ${totalNights} malam</p>
+                <p><strong><i class="fas fa-users fa-fw mr-2"></i>Tamu:</strong> ${guests.adult} Dewasa, ${guests.child} Anak (${guests.room} kamar)</p>
+                <div class="border-t my-3"></div>
+                <h4 class="font-semibold mb-2">Data Tamu</h4>
+                <p><strong><i class="fas fa-user fa-fw mr-2"></i>Nama:</strong> ${bookerDetails.gender}. ${bookerDetails.fullName}</p>
+                <p><strong><i class="fas fa-id-card fa-fw mr-2"></i>Identitas:</strong> ${bookerDetails.idType} - ${bookerDetails.idNumber}</p>
+                <div class="mt-4 text-center bg-white dark:bg-gray-800 p-3 rounded-lg">
+                    <p class="text-muted text-sm">Total Pembayaran</p>
+                    <p class="text-2xl font-bold text-primary">Rp ${totalPrice.toLocaleString('id-ID')}</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <button onclick="showNotification('Fitur segera hadir!')" class="btn-primary w-full"><i class="fas fa-download mr-2"></i>Download Voucher</button>
+                <button onclick="setActiveNav('homepage', true)" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"><i class="fas fa-home mr-2"></i>Kembali ke Beranda</button>
+            </div>
+        </div>`;
+    hideLoading();
+    activeBookingData = {};
+    navigationStack = [];
+}
+function generateDummyHotelResults(destination) {
+    const results = [];
+    const hotelNames = ["Grand Palace", "Oasis Boutique", "Skyline View", "Central Park Inn", "Marina Bay Resort"];
+    const descriptions = [
+        "Hotel mewah bintang 5 di jantung kota dengan fasilitas kolam renang infinity, spa, dan restoran fine dining. Pemandangan kota yang menakjubkan dari setiap kamar.",
+        "Resor butik yang tenang dengan nuansa tropis. Dikelilingi taman yang rimbun, cocok untuk liburan santai dan melepaskan penat dari kesibukan kota.",
+        "Terletak di lantai atas gedung pencakar langit, menawarkan pemandangan 360 derajat yang spektakuler. Setiap kamar memiliki jendela dari lantai ke langit-langit.",
+        "Hotel ekonomis yang bersih, nyaman, dan strategis. Berjarak jalan kaki dari pusat perbelanjaan dan stasiun kereta, pilihan tepat untuk para backpacker dan pebisnis.",
+        "Hotel dengan akses langsung ke pantai pribadi dan water park. Pilihan sempurna untuk liburan keluarga yang menyenangkan dan penuh aktivitas air."
+    ];
+    const galleryImages = [
+        ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500", "https://images.unsplash.com/photo-1542314831-068cd1dbb5ed?w=500", "https://images.unsplash.com/photo-1568495248636-6432b97bd949?w=500", "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=500", "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=500"],
+        ["https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=500", "https://images.unsplash.com/photo-1596436889106-be35e843f974?w=500", "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500", "https://images.unsplash.com/photo-1445019980597-93e09d1b1a4a?w=500", "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=500"],
+        ["https://images.unsplash.com/photo-1582719508461-905c673771fd?w=500", "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=500", "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=500", "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=500", "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=500"],
+        ["https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=500", "https://images.unsplash.com/photo-1590490359853-3491e8ba235b?w=500", "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=500", "https://images.unsplash.com/photo-1594904351111-a072f80b1a71?w=500", "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=500"],
+        ["https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=500", "https://images.unsplash.com/photo-1586979644265-5146c2e2a567?w=500", "https://images.unsplash.com/photo-1606046604972-77cc76a69a4d?w=500", "https://images.unsplash.com/photo-1549294413-26f195200c16?w=500", "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=500"]
+    ];
+    for (let i = 0; i < hotelNames.length; i++) {
+        results.push({
+            name: `${hotelNames[i]} ${destination}`,
+            rating: (4.2 + Math.random() * 0.7).toFixed(1),
+            location: `Pusat Kota, ${destination}`,
+            price: 450000 + Math.floor(Math.random() * 15) * 50000,
+            image: galleryImages[i][0],
+            imageGallery: galleryImages[i],
+            description: descriptions[i]
+        });
+    }
+    return results;
+}
