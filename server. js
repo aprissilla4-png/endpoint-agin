@@ -1,0 +1,66 @@
+require('dotenv').config(); // <-- TAMBAHKAN BARIS INI DI PALING ATAS
+
+const express = require('express');
+const midtransClient = require('midtrans-client');
+const cors = require('cors');
+
+const app = express();
+const port = 3000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Cek apakah key sudah termuat (opsional, untuk debugging)
+if (!process.env.MIDTRANS_SERVER_KEY || !process.env.MIDTRANS_CLIENT_KEY) {
+    console.error("FATAL ERROR: Midtrans Server Key atau Client Key tidak ditemukan di .env");
+    process.exit(1); // Hentikan server jika key tidak ada
+}
+
+// Inisialisasi Midtrans Snap
+let snap = new midtransClient.Snap({
+    isProduction: false,
+    serverKey: process.env.MIDTRANS_SERVER_KEY,
+    clientKey: process.env.MIDTRANS_CLIENT_KEY
+});
+
+// Endpoint untuk membuat transaksi
+app.post('/create-transaction', async (req, res) => {
+    try {
+        const { amount, userProfile } = req.body;
+
+        if (!amount || amount < 10000) {
+            return res.status(400).json({ error: 'Jumlah top up minimum adalah Rp 10.000' });
+        }
+
+        const orderId = 'TOPUP-' + Date.now();
+        const parameter = {
+            transaction_details: {
+                order_id: orderId,
+                gross_amount: parseInt(amount)
+            },
+            item_details: [{
+                id: 'TOPUP01',
+                price: parseInt(amount),
+                quantity: 1,
+                name: 'Isi Saldo A-GIN TRAVEL'
+            }],
+            customer_details: {
+                first_name: userProfile.fullName || 'Pengguna',
+                email: userProfile.email || 'email@anda.com',
+                phone: userProfile.phone || '08123456789'
+            }
+        };
+
+        const transaction = await snap.createTransaction(parameter);
+        res.status(200).json({ token: transaction.token });
+
+    } catch (error) {
+        console.error("Error creating Midtrans transaction:", error.message);
+        res.status(500).json({ error: 'Gagal membuat transaksi', details: error.message });
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server berjalan di http://localhost:${port}`);
+});
