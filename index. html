@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A-GIN TRAVEL - Super App Perjalanan Indonesia</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=1.1">
+    
+    <style>
+        #splash-screen, #promo-modal-overlay {
+            transition: opacity 0.5s ease-in-out;
+        }
+        #promo-modal-overlay .animate__animated {
+            --animate-duration: 0.5s;
+        }
+        
+        /* Sembunyikan scrollbar untuk kontainer inspirasi */
+        #inspiration-container::-webkit-scrollbar {
+            display: none; /* Untuk browser Chrome, Safari, dan Opera */
+        }
+        #inspiration-container {
+            -ms-overflow-style: none;  /* Untuk IE dan Edge */
+            scrollbar-width: none;  /* Untuk Firefox */
+        }
+    </style>
+</head>
+<body class="pb-20">
+    <div id="splash-screen" class="splash-screen">
+        <img src="agin.jpg" alt="A-GIN Travel Logo" class="splash-logo">
+    </div>
+    <div id="promo-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-[9998] flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-5 relative animate__animated">
+        <button id="close-promo-btn" class="absolute -top-2 -right-2 text-gray-700 bg-white rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold z-10 shadow-md">&times;</button>
+        
+        <img src="banner.jpg" alt="Jelajahi Indonesia" class="w-full h-auto object-contain rounded-lg mb-5">
+        
+        <button id="continue-app-btn" class="w-full bg-orange-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition-colors duration-300 shadow-lg">
+            Lanjut ke Aplikasi
+        </button>
+    </div>
+</div>
+    <div id="menuOverlay" class="fixed inset-0 bg-black bg-opacity-10 z-40 opacity-0 invisible transition-opacity duration-300"></div>
+    <aside id="sideMenu" class="fixed top-0 left-[-100%] w-72 h-full z-50 shadow-lg overflow-y-auto transition-all duration-300">
+        <button onclick="closeMenu()" aria-label="Close menu" class="absolute top-4 right-4 text-white text-3xl"><i class="fas fa-times"></i></button>
+        <div class="pt-16 pb-10 px-6 text-center border-b border-white/20">
+            <div class="relative w-24 h-24 mx-auto rounded-full border-4 border-white/50 overflow-hidden bg-black/20">
+                <img id="sideMenuProfilePic" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full object-cover">
+            </div>
+            <h2 id="sideMenuFullName" class="mt-4 text-white font-semibold text-xl">Pengguna A-GIN</h2>
+            <p id="sideMenuEmail" class="text-white/80 text-sm mt-1 truncate">email@anda.com</p>
+        </div>
+        <nav class="mt-6">
+            <ul class="flex flex-col space-y-1 px-4">
+                <li><button onclick="saveAndNavigate('ai-planner')" class="side-menu-item"><i class="fas fa-magic"></i><span>Rencana AI</span></button></li>
+                <li><button onclick="saveAndNavigate('penerjemah')" class="side-menu-item"><i class="fas fa-language"></i><span>Penerjemah</span></button></li>
+                <li><button onclick="saveAndNavigate('contact-us')" class="side-menu-item"><i class="fas fa-headset"></i><span>Pusat Bantuan</span></button></li>
+                <li><button onclick="saveAndNavigate('tentang-kami')" class="side-menu-item"><i class="fas fa-info-circle"></i><span>Tentang Kami</span></button></li>
+                <li><button onclick="saveAndNavigate('pengaturan')" class="side-menu-item"><i class="fas fa-cog"></i><span>Pengaturan</span></button></li>
+            </ul>
+        </nav>
+        <div id="logoutButtonContainer" class="mt-10 px-4">
+        </div>
+    </aside>
+    <header id="header" class="header-main">
+        <div id="header-left" class="w-8">
+        </div>
+        <h1 class="font-bold text-lg">A-GIN TRAVEL</h1>
+        <button onclick="openMenu()" aria-label="Open menu" class="text-2xl w-8 text-center"><i class="fas fa-bars"></i></button>
+    </header>
+    <main class="main-content">
+        <section id="homepage" class="content-section">
+            <div class="px-4 pt-4">
+                <div class="relative rounded-xl overflow-hidden shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2940&auto=format&fit=crop" class="w-full h-36 object-cover" alt="Banner Perjalanan">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-4">
+                        <h2 class="text-white text-xl font-bold">Tetap bisa tambah bagasi</h2>
+                        <p class="text-white/90 text-sm">Walau e-tiket sudah terbit!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <a href="#" onclick="setActiveNav('pesawat')" class="flex flex-col items-center p-2 space-y-2">
+                        <div class="w-14 h-14 bg-blue-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-md"><i class="fas fa-plane-departure"></i></div>
+                        <span class="text-xs font-medium text-gray-700">Pesawat</span>
+                    </a>
+                    <a href="#" onclick="setActiveNav('kereta')" class="flex flex-col items-center p-2 space-y-2">
+                        <div class="w-14 h-14 bg-green-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-md"><i class="fas fa-train"></i></div>
+                        <span class="text-xs font-medium text-gray-700">Kereta</span>
+                    </a>
+                    <a href="#" onclick="setActiveNav('hotel')" class="flex flex-col items-center p-2 space-y-2">
+                        <div class="w-14 h-14 bg-orange-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-md"><i class="fas fa-hotel"></i></div>
+                        <span class="text-xs font-medium text-gray-700">Hotel</span>
+                    </a>
+                    <a href="#" onclick="setActiveNav('pelni')" class="flex flex-col items-center p-2 space-y-2">
+                        <div class="w-14 h-14 bg-indigo-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-md"><i class="fas fa-ship"></i></div>
+                        <span class="text-xs font-medium text-gray-700">PELNI</span>
+                    </a>
+                    <a href="#" onclick="setActiveNav('ferry')" class="flex flex-col items-center p-2 space-y-2">
+                        <div class="w-14 h-14 bg-pink-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-md"><i class="fas fa-ferry"></i></div>
+                        <span class="text-xs font-medium text-gray-700">Ferry</span>
+                    </a>
+                    <a href="#" onclick="setActiveNav('pulsa')" class="flex flex-col items-center p-2 space-y-2">
+                        <div class="w-14 h-14 bg-purple-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-md"><i class="fas fa-mobile-alt"></i></div>
+                        <span class="text-xs font-medium text-gray-700">Pulsa</span>
+                    </a>
+                    <a href="#" onclick="setActiveNav('ai-planner')" class="flex flex-col items-center p-2 space-y-2">
+                        <div class="w-14 h-14 bg-rose-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-md"><i class="fas fa-magic"></i></div>
+                        <span class="text-xs font-medium text-gray-700">Rencana AI</span>
+                    </a>
+                    <a href="#" onclick="setActiveNav('penerjemah')" class="flex flex-col items-center p-2 space-y-2">
+                        <div class="w-14 h-14 bg-cyan-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-md"><i class="fas fa-language"></i></div>
+                        <span class="text-xs font-medium text-gray-700">Penerjemah</span>
+                    </a>
+                    <a href="#" onclick="setActiveNav('contact-us')" class="flex flex-col items-center p-2 space-y-2">
+                        <div class="w-14 h-14 bg-teal-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-md"><i class="fas fa-headset"></i></div>
+                        <span class="text-xs font-medium text-gray-700">Pusat Bantuan</span>
+                    </a>
+                </div>
+            </div>
+            <div class="w-full mt-2">
+                <h2 class="text-xl font-bold text-gray-800 mb-3 px-4">Inspirasi & Promo Untukmu ✨</h2>
+                <div id="inspiration-container" class="flex overflow-x-auto pb-4 pl-4 space-x-4">
+                    <div class="flex-none w-72 bg-white rounded-xl shadow-lg overflow-hidden">
+                        <img class="w-full h-36 object-cover" src="https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?q=80&w=2940&auto=format&fit=crop" alt="Promo Bali">
+                        <div class="p-3">
+                            <h3 class="font-semibold text-gray-900 text-base truncate">Promo: Diskon Tiket 20% ke Bali!</h3>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">Nikmati liburan tak terlupakan di Pulau Dewata dengan penawaran spesial.</p>
+                        </div>
+                    </div>
+                    <div class="flex-none w-72 bg-white rounded-xl shadow-lg overflow-hidden">
+                        <img class="w-full h-36 object-cover" src="https://images.unsplash.com/photo-1595042376483-4b6a4d7b6b1a?q=80&w=2874&auto=format&fit=crop" alt="Wisata Yogyakarta">
+                        <div class="p-3">
+                            <h3 class="font-semibold text-gray-900 text-base truncate">5 Kuliner Wajib Coba di Jogja</h3>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">Jelajahi cita rasa otentik Yogyakarta yang akan memanjakan lidah Anda.</p>
+                        </div>
+                    </div>
+                    <div class="flex-none w-72 bg-white rounded-xl shadow-lg overflow-hidden">
+                        <img class="w-full h-36 object-cover" src="https://images.unsplash.com/photo-1588622269654-7f6aaa3172e2?q=80&w=2938&auto=format&fit=crop" alt="Raja Ampat">
+                        <div class="p-3">
+                            <h3 class="font-semibold text-gray-900 text-base truncate">Surga Tersembunyi di Raja Ampat</h3>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">Temukan keindahan bawah laut yang menakjubkan dan pemandangan ikonik.</p>
+                        </div>
+                    </div>
+                    <div class="flex-none w-1"></div>
+                </div>
+            </div>
+        </section>
+        
+       <section id="pesawat" class="content-section hidden">
+    <div class="p-4">
+        <div class="bg-white rounded-2xl shadow-lg p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-800 flex items-center"><i class="fas fa-plane mr-2 text-gray-500"></i>Cari Tiket Pesawat</h2>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm font-medium text-gray-600">Pergi-Pulang</span>
+                    <label for="round-trip-toggle" class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="round-trip-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                </div>
+            </div>
+            <form id="flight-search-form" class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium text-gray-700 ml-1 mb-1 block">Dari</label>
+                    <div class="relative">
+                        <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Lokasi asal" class="w-full pl-10 pr-4 py-2.5 border-gray-200 bg-gray-50 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-700 ml-1 mb-1 block">Ke</label>
+                    <div class="relative">
+                        <i class="fas fa-plane-arrival absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Lokasi tujuan" class="w-full pl-10 pr-4 py-2.5 border-gray-200 bg-gray-50 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-700 ml-1 mb-1 block">Tanggal Berangkat</label>
+                    <div class="relative">
+                        <i class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Pilih tanggal" onfocus="(this.type='date')" onblur="(this.type='text')" class="w-full pl-10 pr-4 py-2.5 border-gray-200 bg-gray-50 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                </div>
+                <div id="return-date-container" class="hidden">
+                    <label class="text-sm font-medium text-gray-700 ml-1 mb-1 block">Tanggal Pulang</label>
+                    <div class="relative">
+                        <i class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Pilih tanggal" onfocus="(this.type='date')" onblur="(this.type='text')" class="w-full pl-10 pr-4 py-2.5 border-gray-200 bg-gray-50 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-700 ml-1 mb-1 block">Penumpang</label>
+                    <div class="relative">
+                        <i class="fas fa-users absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" value="1 Dewasa" readonly class="w-full pl-10 pr-4 py-2.5 border-gray-200 bg-gray-50 rounded-lg focus:ring-purple-500 focus:border-purple-500 cursor-pointer">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity duration-300 shadow-lg flex items-center justify-center">
+                    <i class="fas fa-search mr-2"></i>Cari Tiket
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+        <section id="kereta" class="content-section hidden"></section>
+        <section id="hotel" class="content-section hidden"></section>
+        <section id="hotel-detail" class="content-section hidden"></section>
+        <section id="pelni" class="content-section hidden"></section>
+        <section id="ferry" class="content-section hidden"></section>
+        <section id="pulsa" class="content-section hidden"></section>
+        <section id="berita" class="content-section hidden">
+            <div class="p-4">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Berita Perjalanan Terkini</h2>
+                <div id="news-container" class="space-y-4">
+                    <p class="text-center text-gray-500 mt-8">Memuat berita...</p>
+                </div>
+            </div>
+        </section>
+        <section id="ai-planner" class="content-section hidden"></section>
+        <section id="penerjemah" class="content-section hidden"></section>
+        <section id="contact-us" class="content-section hidden"></section>
+        <section id="tentang-kami" class="content-section hidden"></section>
+        <section id="report" class="content-section hidden"></section>
+        <section id="pengaturan" class="content-section hidden"></section>
+        <section id="topup" class="content-section hidden"></section>
+        <section id="kebijakan-privasi" class="content-section hidden"></section>
+        <section id="withdrawal" class="content-section hidden"></section>
+        <section id="pin-setup" class="content-section hidden"></section>
+        <section id="pesawat-grup" class="content-section hidden"></section>
+    </main>
+    
+    <nav class="bottom-nav">
+        <div class="flex justify-around items-center py-2">
+            <button onclick="setActiveNav('homepage', true)" class="nav-btn active flex flex-col items-center p-2 w-1/4"><i class="fas fa-home text-xl mb-1"></i><span class="text-xs">Home</span></button>
+            <button onclick="setActiveNav('pesawat')" class="nav-btn flex flex-col items-center p-2 w-1/4"><i class="fas fa-search text-xl mb-1"></i><span class="text-xs">Cari</span></button>
+            <button onclick="setActiveNav('berita')" class="nav-btn flex flex-col items-center p-2 w-1/4"><i class="fas fa-newspaper text-xl mb-1"></i><span class="text-xs">Berita</span></button>
+            <button onclick="setActiveNav('contact-us')" class="nav-btn flex flex-col items-center p-2 w-1/4"><i class="fas fa-headset text-xl mb-1"></i><span class="text-xs">Kontak</span></button>
+        </div>
+    </nav>
+    
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-60 z-[9999] flex flex-col items-center justify-center hidden">
+        <div class="w-16 h-16 border-4 border-white border-t-transparent border-solid rounded-full animate-spin"></div>
+        <p id="loadingText" class="text-white text-lg mt-4 font-semibold">Memproses...</p>
+    </div>
+    <div id="clerk-auth-container"></div>
+  
+ 
+    <script src="api.js"></script>
+   
+    <script src="booking.js"></script>
+    <script src="payment.js"></script>
+    <script src="main.js"></script>
+   
+    
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Memanggil fungsi dari main.js untuk menampilkan 'homepage'
+            if (typeof setActiveNav === 'function') {
+                setActiveNav('homepage', true);
+            }
+        });
+    </script>
+</body>
+</html>
