@@ -612,27 +612,84 @@ function selectNominal(amount, element) {
     element.classList.add('active');
     document.getElementById('customAmount').value = '';
 }
+// main.js
+
 function proceedToPaymentMethods() {
     let amount = 0;
     const selectedNominal = document.querySelector('.nominal-btn.active');
+
     if (selectedNominal) {
         amount = parseFloat(selectedNominal.textContent.replace(/[^0-9]/g, ''));
     } else {
         amount = parseFloat(document.getElementById('customAmount').value);
     }
+
     if (isNaN(amount) || amount < 10000) {
         showNotification("Jumlah top up minimum adalah Rp 10.000.");
         return;
     }
-    saveStateAndProceed('topup', renderPaymentMethods, amount);
-}
-function renderPaymentMethods(amount) {
-    const container = document.getElementById('topup');
-    if (!container) return;
-    updateHeader('topup', 'Pilih Metode Pembayaran');
-    const bcaLogoPath = 'bca_logo.png';
-    const mandiriLogoPath = 'mandiri_logo.png';
-    container.innerHTML = `<div class="form-section"><div class="text-center mb-6"><p class="text-muted">Total Pembayaran</p><h2 class="text-3xl font-bold">${formatCurrency(amount)}</h2></div><h3 class="font-semibold mb-3 text-muted">Virtual Account</h3><div class="space-y-3 mb-6"><div class="payment-method-card" onclick="selectPaymentMethod('BCA Virtual Account', ${amount})"><div class="flex items-center gap-4"><img src="${bcaLogoPath}" alt="BCA Logo" class="bank-logo"><span class="font-semibold">BCA Virtual Account</span></div><i class="fas fa-chevron-right text-gray-400"></i></div><div class="payment-method-card" onclick="selectPaymentMethod('Mandiri Virtual Account', ${amount})"><div class="flex items-center gap-4"><img src="${mandiriLogoPath}" alt="Mandiri Logo" class="bank-logo"><span class="font-semibold">Mandiri Virtual Account</span></div><i class="fas fa-chevron-right text-gray-400"></i></div></div><h3 class="font-semibold mb-3 text-muted">E-Wallet</h3><div class="space-y-3"><div class="payment-method-card" onclick="selectPaymentMethod('QRIS', ${amount})"><div class="flex items-center gap-4"><i class="fas fa-qrcode text-2xl text-sky-500"></i><span class="font-semibold">QRIS</span></div><i class="fas fa-chevron-right text-gray-400"></i></div></div></div>`;
+
+    // Tampilkan loading
+    showLoading('Membuat transaksi...');
+
+    // Ambil data profil pengguna untuk dikirim ke Midtrans
+    const userProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
+    if (window.Clerk && window.Clerk.user) {
+         const clerkUser = window.Clerk.user;
+         userProfile.fullName = userProfile.fullName || clerkUser.fullName;
+         userProfile.email = clerkUser.primaryEmailAddress.emailAddress;
+    }
+
+   
+        fetch('http://agin-endpoint.vercel.app/', { 
+            method: 'POST',
+            headers: {
+
+
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount: amount, userProfile: userProfile })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.token) {
+            // Jika token diterima, buka pop-up pembayaran Midtrans
+            window.snap.pay(data.token, {
+                onSuccess: function(result) {
+                    /* Pembayaran sukses! */
+                    console.log('Payment Success:', result);
+                    handleSuccessfulPayment(amount, result.payment_type.replace(/_/g, ' ').toUpperCase());
+                    showNotification('Top up berhasil!');
+                },
+                onPending: function(result) {
+                    /* Menunggu pembayaran */
+                    console.log('Payment Pending:', result);
+                    showNotification('Menunggu pembayaran Anda.');
+                    // Kembali ke homepage agar pengguna bisa melanjutkan aktivitas lain
+                    navigationStack = []; 
+                    setActiveNav('homepage');
+                },
+                onError: function(result) {
+                    /* Pembayaran gagal */
+                    console.error('Payment Error:', result);
+                    showNotification('Pembayaran gagal. Silakan coba lagi.');
+                },
+                onClose: function() {
+                    /* Pop-up ditutup tanpa transaksi */
+                    showNotification('Anda menutup jendela pembayaran.');
+                }
+            });
+        } else {
+            // Jika ada error dari server
+            showNotification(data.error || 'Gagal membuat transaksi.');
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Error:', error);
+        showNotification('Tidak dapat terhubung ke server pembayaran.');
+    });
 }
 function selectPaymentMethod(method, amount) {
     saveStateAndProceed('topup', renderPaymentInstructionsPage, method, amount);
@@ -658,26 +715,27 @@ function renderPaymentInstructionsPage(method, amount) {
     }
     container.innerHTML = `<div class="form-section"><div class="text-center mb-6"><p class="text-muted">Total Pembayaran</p><h2 class="text-3xl font-bold">${formatCurrency(amount)}</h2><p class="mt-1 font-semibold">Metode: ${method}</p></div><div class="border-t dark:border-gray-700 pt-6">${instructionsHTML}<button class="btn-primary w-full !mt-6" onclick="simulatePayment('${method}', ${amount})">Saya Sudah Bayar</button><p class="text-xs text-center text-muted mt-4">Ini adalah simulasi. Klik tombol di atas untuk menyelesaikan top up.</p></div></div>`;
 }
-function simulatePayment(method, amount) {
-    showLoading('Mengkonfirmasi pembayaran...');
-    setTimeout(() => {
-        let currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
-        const newBalance = currentBalance + amount;
-        localStorage.setItem('userBalance', newBalance);
-        const history = getTopUpHistory();
-        history.unshift({
-            id: generateTransactionId(),
-            date: new Date().toISOString(),
-            method: method,
-            amount: amount,
-            status: 'success'
-        });
-        saveTopUpHistory(history);
-        hideLoading();
-        showNotification('Top up berhasil!');
-        navigationStack = [];
-        setActiveNav('homepage');
-    }, 2500);
+// main.js
+
+function handleSuccessfulPayment(amount, paymentMethod) {
+    let currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+    const newBalance = currentBalance + amount;
+    localStorage.setItem('userBalance', newBalance);
+
+    const history = getTopUpHistory();
+    history.unshift({
+        id: generateTransactionId(),
+        date: new Date().toISOString(),
+        method: `Top up via ${paymentMethod}`,
+        amount: amount,
+        status: 'success'
+    });
+    saveTopUpHistory(history);
+
+    // Reset navigasi dan kembali ke homepage
+    navigationStack = []; 
+    setActiveNav('homepage');
+    renderSaldo(); // Perbarui tampilan saldo di homepage
 }
 function renderTopUpHistoryList() {
     const contentContainer = document.getElementById('topup-tab-content');
