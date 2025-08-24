@@ -1,0 +1,644 @@
+// PAYMENT.JS (VERSI FINAL DENGAN FITUR E-WALLET - GOJEK)
+
+// --- DATABASE PRODUK & KONFIGURASI ---
+const CARRIER_PREFIXES = {
+    "Telkomsel": { prefixes: ["0811", "0812", "0813", "0821", "0822", "0851", "0852", "0853"], logo: "telkomsel.jpeg" },
+    "Indosat":   { prefixes: ["0814", "0815", "0816", "0855", "0856", "0857", "0858"], logo: "indosat.jpg" },
+    "XL":        { prefixes: ["0817", "0818", "0819", "0859", "0877", "0878"], logo: "xl.png" },
+    "AXIS":      { prefixes: ["0831", "0832", "0833", "0838"], logo: "axis.jpeg" },
+    "Tri":       { prefixes: ["0895", "0896", "0897", "0898", "0899"], logo: "three.jpeg" },
+    "Smartfren": { prefixes: ["0881", "0882", "0883", "0884", "0885", "0886", "0887", "0888", "0889"], logo: "smart.jpeg" }
+};
+
+const PRODUCTS = {
+    pulsa: [5000, 10000, 15000, 20000, 25000, 50000, 75000, 100000],
+    tokenListrik: [
+        { nominal: 20000, price: 22500 }, { nominal: 50000, price: 52500 },
+        { nominal: 100000, price: 102500 }, { nominal: 200000, price: 202500 },
+        { nominal: 500000, price: 502500 }, { nominal: 1000000, price: 1002500 },
+    ],
+    data: {
+        telkomsel: [{
+            categoryName: "🔥 Hot Promo",
+            products: [
+                { name: "Internet SAKTI 11GB", validity: "30 Hari", price: 28000, isPromo: true },
+                { name: "Combo SAKTI 20GB", validity: "30 Hari", price: 50000, isPromo: true },
+                { name: "InternetMAX 35GB", validity: "30 Hari", price: 78000, isPromo: false }
+            ]
+        }, {
+            categoryName: "Internet OMG!",
+            products: [
+                { name: "OMG! 4.5GB", validity: "30 Hari", price: 41000, isPromo: false },
+                { name: "OMG! 14GB", validity: "30 Hari", price: 81000, isPromo: false },
+            ]
+        }],
+        indosat: [{
+            categoryName: "Freedom Internet",
+            products: [
+                { name: "Freedom 3GB", validity: "30 Hari", price: 15000, isPromo: false },
+                { name: "Freedom 15GB", validity: "30 Hari", price: 50000, isPromo: true },
+                { name: "Freedom 50GB", validity: "30 Hari", price: 100000, isPromo: false }
+            ]
+        }],
+        xl: [{
+            categoryName: "Xtra Combo Flex",
+            products: [
+                { name: "Flex S+ 4.5GB", validity: "30 Hari", price: 25000, isPromo: true },
+                { name: "Flex M 12GB", validity: "30 Hari", price: 45000, isPromo: false },
+                { name: "Flex L 26GB", validity: "30 Hari", price: 65000, isPromo: false }
+            ]
+        }],
+        axis: [{
+            categoryName: "Bronet & Owsem",
+            products: [
+                { name: "Bronet 24 Jam 3GB", validity: "30 Hari", price: 19000, isPromo: true },
+                { name: "Bronet 24 Jam 8GB", validity: "30 Hari", price: 38000, isPromo: false },
+                { name: "Owsem 16GB", validity: "30 Hari", price: 49000, isPromo: false },
+            ]
+        }],
+        tri: [{
+            categoryName: "Paket AON",
+            products: [
+                { name: "AON 6GB", validity: "Mengikuti Masa Aktif", price: 35000, isPromo: false },
+                { name: "AON 16GB", validity: "Mengikuti Masa Aktif", price: 60000, isPromo: true },
+                { name: "AON Unlimited", validity: "30 Hari", price: 80000, isPromo: false }
+            ]
+        }],
+        smartfren: [{
+            categoryName: "Unlimited & Kuota",
+            products: [
+                { name: "Unlimited Harian 1GB", validity: "28 Hari", price: 80000, isPromo: true },
+                { name: "Kuota Nonstop 30GB", validity: "30 Hari", price: 70000, isPromo: false },
+                { name: "Kuota 60GB", validity: "30 Hari", price: 100000, isPromo: false },
+            ]
+        }]
+    },
+    voucherGame: [
+        { id: 'mobile_legends', name: 'Mobile Legends', logo: 'mobille.jpeg', needsZoneId: true, products: [ { name: '86 Diamonds', price: 22000 }, { name: '172 Diamonds', price: 44000 }, { name: '257 Diamonds', price: 66000 }, { name: 'Weekly Diamond Pass', price: 29500 } ] },
+        { id: 'pubg_mobile', name: 'PUBG Mobile', logo: 'pubg.jpeg', needsZoneId: false, products: [ { name: '60 UC', price: 14500 }, { name: '325 UC', price: 73000 }, { name: '660 UC', price: 145000 }, { name: '1800 UC', price: 363000 } ] },
+        { id: 'free_fire', name: 'Free Fire', logo: 'frefire.png', needsZoneId: false, products: [ { name: '70 Diamonds', price: 10000 }, { name: '140 Diamonds', price: 20000 }, { name: '355 Diamonds', price: 50000 }, { name: '720 Diamonds', price: 100000 } ] },
+        { id: 'honor_of_kings', name: 'Honor of Kings', logo: 'honor.png', needsZoneId: false, products: [ { name: '105 Tokens', price: 20000 }, { name: '210 Tokens', price: 40000 }, { name: '525 Tokens', price: 100000 }, { name: '1050 Tokens', price: 200000 } ] },
+        { id: 'garena_undawn', name: 'Garena Undawn', logo: 'garena.jpeg', needsZoneId: false, products: [ { name: '60 RC', price: 10000 }, { name: '300 RC', price: 50000 }, { name: '680 RC', price: 100000 }, { name: '1180 RC', price: 200000 } ] }
+    ],
+    eWallet: [
+        { 
+            id: 'dana', 
+            name: 'DANA', 
+            logo: 'dana.png',
+            products: [
+                { nominal: 10000, price: 11500 }, { nominal: 20000, price: 21500 },
+                { nominal: 25000, price: 26500 }, { nominal: 50000, price: 51500 },
+                { nominal: 100000, price: 101500 }, { nominal: 250000, price: 251500 }
+            ] 
+        },
+        { 
+            id: 'ovo', 
+            name: 'OVO', 
+            logo: 'ovo.png',
+            products: [
+                { nominal: 20000, price: 21500 }, { nominal: 25000, price: 26500 },
+                { nominal: 50000, price: 51500 }, { nominal: 100000, price: 101500 },
+                { nominal: 200000, price: 201500 }, { nominal: 500000, price: 501500 }
+            ] 
+        },
+        { 
+            id: 'gojek', 
+            name: 'Gojek', 
+            logo: 'gojek.png',
+            products: [
+                { nominal: 10000, price: 11500 }, { nominal: 20000, price: 21500 },
+                { nominal: 50000, price: 51500 }, { nominal: 100000, price: 101500 },
+                { nominal: 200000, price: 201500 }, { nominal: 300000, price: 301500 }
+            ] 
+        },
+        { 
+            id: 'shopeepay', 
+            name: 'ShopeePay', 
+            logo: 'shopeepay.png',
+            products: [
+                { nominal: 10000, price: 11500 }, { nominal: 25000, price: 26500 },
+                { nominal: 50000, price: 51500 }, { nominal: 100000, price: 101500 },
+                { nominal: 200000, price: 201500 }, { nominal: 500000, price: 501500 }
+            ] 
+        }
+    ]
+};
+
+// --- FUNGSI NAVIGASI UTAMA & RENDER HALAMAN ---
+function renderPulsaPage() {
+    const container = document.getElementById('pulsa');
+    if (!container) return;
+    updateHeader('pulsa');
+
+    const pulsaMenu = [
+        { id: 'pulsa-reguler', name: 'Pulsa', logo: 'pulsa.jpeg' },
+        { id: 'paket-data', name: 'Paket Data', logo: 'paket.png' },
+        { id: 'token-listrik', name: 'Token Listrik', logo: 'token.jpeg' },
+        { id: 'e-wallet', name: 'E-Wallet', logo: 'ewallet.png' },
+        { id: 'voucher-game', name: 'Voucher Game', logo: 'game.png' }
+    ];
+
+    const menuHTML = pulsaMenu.map(item => `
+        <div class="pulsa-menu-item flex flex-col items-center justify-start space-y-2 cursor-pointer group" onclick="switchPulsaTab('${item.id}', this)">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-100 dark:bg-gray-700 transition-all duration-300 shadow-sm group-hover:shadow-lg group-hover:bg-gray-200">
+                <img src="${item.logo}" alt="${item.name}" class="w-10 h-10 object-contain transition-transform duration-300 group-hover:scale-110">
+            </div>
+            <p class="font-medium text-xs text-gray-600 dark:text-gray-300">${item.name}</p>
+        </div>
+    `).join('');
+
+    container.innerHTML = `
+        <div class="p-4 space-y-4">
+            <div class="grid grid-cols-5 gap-2 text-center text-sm" id="pulsa-tabs">${menuHTML}</div>
+            <hr class="border-gray-200 dark:border-gray-700">
+            <div id="pulsa-content"></div>
+        </div>`;
+    
+    switchPulsaTab('pulsa-reguler');
+}
+
+function switchPulsaTab(tabId, element) {
+    document.querySelectorAll('#pulsa-tabs .pulsa-menu-item').forEach(item => item.classList.remove('active'));
+    if (element) {
+        element.classList.add('active');
+    } else {
+        const firstTab = document.querySelector('#pulsa-tabs .pulsa-menu-item');
+        if (firstTab) firstTab.classList.add('active');
+    }
+    const contentContainer = document.getElementById('pulsa-content');
+    if (!contentContainer) return;
+    switch (tabId) {
+        case 'pulsa-reguler': renderPulsaRegulerTab(contentContainer); break;
+        case 'paket-data': renderPaketDataTab(contentContainer); break;
+        case 'token-listrik': renderTokenListrikTab(contentContainer); break;
+        case 'e-wallet': renderEwalletTab(contentContainer); break;
+        case 'voucher-game': renderVoucherGameTab(contentContainer); break;
+        default: contentContainer.innerHTML = `<div class="text-center p-8 text-muted">Fitur Segera Hadir</div>`; break;
+    }
+}
+
+// --- FUNGSI FITUR PULSA REGULER ---
+function renderPulsaRegulerTab(container) {
+    container.innerHTML = `
+        <div class="form-section !pt-0">
+            <label class="block text-sm font-medium text-muted mb-1">Nomor HP</label>
+            <div class="relative">
+                <div id="carrier-logo-container" class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center pointer-events-none"></div>
+                <input type="tel" id="phone-number-input" oninput="handlePhoneInput(this)" class="modern-input !pl-12" placeholder="Masukkan nomor HP">
+            </div>
+        </div>
+        <div class="mt-4" id="pulsa-product-container"></div>`;
+}
+
+function handlePhoneInput(inputElement) {
+    const value = inputElement.value;
+    const logoContainer = document.getElementById('carrier-logo-container');
+    const productContainer = document.getElementById('pulsa-product-container');
+    let detectedCarrier = null;
+
+    if (value.length >= 4) {
+        for (const carrier in CARRIER_PREFIXES) {
+            if (CARRIER_PREFIXES[carrier].prefixes.some(p => value.startsWith(p))) {
+                detectedCarrier = carrier;
+                break;
+            }
+        }
+    }
+
+    if (detectedCarrier) {
+        logoContainer.innerHTML = `<img src="${CARRIER_PREFIXES[detectedCarrier].logo}" alt="${detectedCarrier}" class="w-7 h-7 object-contain">`;
+        if (value.length >= 8) {
+            showPulsaProducts(productContainer, detectedCarrier);
+        } else {
+            productContainer.innerHTML = '';
+        }
+    } else {
+        logoContainer.innerHTML = '';
+        productContainer.innerHTML = '';
+    }
+}
+
+function showPulsaProducts(container, carrier) {
+    const adminFee = 1500;
+    const productGridHTML = PRODUCTS.pulsa.map(p => {
+        const finalPrice = p + adminFee;
+        const productData = { nominal: p, price: finalPrice };
+        return `<div class="product-card" onclick='showPulsaRincianModal(${JSON.stringify(productData)}, "${carrier}")'>
+                    <p class="font-bold text-lg">${p.toLocaleString('id-ID')}</p>
+                    <p class="text-sm text-blue-600 font-semibold">Rp ${finalPrice.toLocaleString('id-ID')}</p>
+                </div>`;
+    }).join('');
+    container.innerHTML = `<h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-3 mt-4">Pilih Nominal</h3><div class="grid grid-cols-2 md:grid-cols-3 gap-3">${productGridHTML}</div>`;
+}
+
+function showPulsaRincianModal(product, carrier) {
+    const phoneNumber = document.getElementById('phone-number-input').value;
+    if (!phoneNumber || phoneNumber.length < 8) {
+        showNotification('Harap isi Nomor HP yang valid.');
+        return;
+    }
+    const contentHTML = `
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span>Nomor HP</span><span class="font-semibold">${phoneNumber}</span></div>
+            <div class="flex justify-between"><span>Provider</span><span class="font-semibold">${carrier}</span></div>
+            <div class="flex justify-between"><span>Nominal Pulsa</span><span class="font-semibold">Rp ${product.nominal.toLocaleString('id-ID')}</span></div>
+            <div class="flex justify-between pt-2 border-t mt-2 dark:border-gray-600">
+                <span class="font-medium">Total Harga</span>
+                <span class="font-bold text-lg text-primary">Rp ${product.price.toLocaleString('id-ID')}</span>
+            </div>
+        </div>`;
+    showPurchaseModal({
+        title: 'Rincian Pembelian Pulsa',
+        contentHTML: contentHTML,
+        onConfirm: () => {
+            const purchaseDetails = { type: 'Pulsa', name: `Pulsa ${carrier} ${product.nominal.toLocaleString('id-ID')}`, price: product.price, customerId: phoneNumber };
+            setTimeout(() => renderPaymentConfirmation(purchaseDetails), 100);
+        }
+    });
+}
+
+// --- FUNGSI FITUR PAKET DATA ---
+function renderPaketDataTab(container) {
+    const dataCarriers = Object.keys(PRODUCTS.data).map(carrierKey => {
+        let finalCarrierName;
+        if (carrierKey === 'xl') { finalCarrierName = 'XL'; } 
+        else if (carrierKey === 'axis') { finalCarrierName = 'AXIS'; } 
+        else { finalCarrierName = carrierKey.charAt(0).toUpperCase() + carrierKey.slice(1); }
+        return { name: finalCarrierName, logo: CARRIER_PREFIXES[finalCarrierName]?.logo || '' };
+    });
+
+    container.innerHTML = `
+        <div class="form-section !pt-0">
+            <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">Pilih Operator</h3>
+            <div class="grid grid-cols-4 gap-4">${dataCarriers.map(carrier => `
+                <div class="flex flex-col items-center space-y-2 cursor-pointer" onclick="renderDataProductList('${carrier.name}')">
+                    <img src="${carrier.logo}" alt="${carrier.name}" class="w-12 h-12 object-contain bg-white rounded-lg p-1 shadow">
+                    <p class="text-xs text-center">${carrier.name}</p>
+                </div>`).join('')}
+            </div>
+        </div>`;
+}
+
+function renderDataProductList(carrierName) {
+    const carrierId = carrierName.toLowerCase();
+    const contentContainer = document.getElementById('pulsa-content');
+    const carrierData = PRODUCTS.data[carrierId];
+    if (!carrierData) {
+        contentContainer.innerHTML = `<div class="p-4"><p class="text-center text-muted p-8">Produk untuk ${carrierName} segera hadir.</p></div>`;
+        return;
+    }
+    const carrierLogo = CARRIER_PREFIXES[carrierName]?.logo || '';
+
+    contentContainer.innerHTML = `
+        <div class="space-y-4">
+            <div><button class="font-semibold text-blue-600 flex items-center gap-2" onclick="switchPulsaTab('paket-data', document.querySelector('[onclick*=\\'paket-data\\']'))"><i class="fas fa-arrow-left"></i><span>Kembali</span></button></div>
+            <div class="form-section !p-4 !m-0">
+                <label class="block text-sm font-medium text-muted mb-1">Nomor HP Tujuan</label>
+                <div class="relative">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center pointer-events-none"><img src="${carrierLogo}" class="w-7 h-7 object-contain"></div>
+                    <input type="tel" id="data-phone-number" class="modern-input !pl-12" placeholder="Masukkan nomor HP">
+                </div>
+            </div>
+            <div id="data-product-container" class="space-y-4">${generateDataProductHTML(carrierId, carrierData)}</div>
+        </div>`;
+}
+
+function generateDataProductHTML(carrierId, data) {
+    if (data.length === 0) return `<p class="text-center text-muted p-8">Produk tidak ditemukan.</p>`;
+    let html = '';
+    const fullCarrierData = PRODUCTS.data[carrierId];
+
+    data.forEach(category => {
+        html += `<h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-3 mt-4">${category.categoryName}</h3>`;
+        const productsGrid = category.products.map(prod => {
+            const originalCategoryIndex = fullCarrierData.findIndex(c => c.categoryName === category.categoryName);
+            const originalProductIndex = fullCarrierData[originalCategoryIndex].products.findIndex(p => p.name === prod.name);
+            return `<div class="product-card-list" onclick='showDataRincianModal("${carrierId}", ${originalCategoryIndex}, ${originalProductIndex})'>
+                <div><p class="font-semibold">${prod.name}</p><p class="text-sm text-muted">${prod.validity}</p></div>
+                <button class="btn-primary !py-1 !px-3">Rp ${prod.price.toLocaleString('id-ID')}</button>
+            </div>`;
+        }).join('');
+        html += `<div class="space-y-3">${productsGrid}</div>`;
+    });
+    return html;
+}
+
+function showDataRincianModal(carrierId, categoryIndex, productIndex) {
+    const phoneNumber = document.getElementById('data-phone-number').value;
+    if (!phoneNumber || phoneNumber.length < 8) {
+        showNotification('Harap isi Nomor HP Tujuan yang valid.');
+        return;
+    }
+    const product = PRODUCTS.data[carrierId][categoryIndex].products[productIndex];
+    const contentHTML = `
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span>Nomor Tujuan</span><span class="font-semibold">${phoneNumber}</span></div>
+            <div class="flex justify-between"><span>Produk</span><span class="font-semibold">${product.name}</span></div>
+            <div class="flex justify-between"><span>Masa Aktif</span><span class="font-semibold">${product.validity}</span></div>
+            <div class="flex justify-between pt-2 border-t mt-2 dark:border-gray-600">
+                <span class="font-medium">Harga</span>
+                <span class="font-bold text-lg text-primary">Rp ${product.price.toLocaleString('id-ID')}</span>
+            </div>
+        </div>`;
+
+    showPurchaseModal({
+        title: 'Rincian Paket Data',
+        contentHTML: contentHTML,
+        onConfirm: () => {
+            const purchaseDetails = { type: 'Paket Data', name: product.name, price: product.price, customerId: phoneNumber };
+            setTimeout(() => renderPaymentConfirmation(purchaseDetails), 100);
+        }
+    });
+}
+
+// --- FUNGSI FITUR TOKEN LISTRIK ---
+function renderTokenListrikTab(container) {
+    container.innerHTML = `
+        <div class="form-section !pt-0">
+            <label class="block text-sm font-medium text-muted mb-1">ID Pelanggan / No. Meter</label>
+            <input type="tel" id="idpel-input" class="modern-input" placeholder="Masukkan ID Pelanggan">
+        </div>
+        <div class="mt-4">
+            <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-3 mt-4">Pilih Nominal Token</h3>
+            <div class="grid grid-cols-2 gap-3">${PRODUCTS.tokenListrik.map(prod => `
+                <div class="product-card !p-3 cursor-pointer" onclick='showTokenDetailModal(${JSON.stringify(prod)})'>
+                    <p class="font-semibold text-sm">TOKEN ${prod.nominal.toLocaleString('id-ID')}</p>
+                    <p class="text-blue-600 font-bold mt-2">Rp ${prod.price.toLocaleString('id-ID')}</p>
+                </div>`).join('')}
+            </div>
+        </div>`;
+}
+
+function showTokenDetailModal(product) {
+    const idpelValue = document.getElementById('idpel-input').value;
+    if(!idpelValue || idpelValue.length < 11) {
+        showNotification("Harap masukkan ID Pelanggan yang valid.");
+        return;
+    }
+    const contentHTML = `
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span>ID Pelanggan</span><span class="font-semibold">${idpelValue}</span></div>
+            <div class="flex justify-between"><span>Produk</span><span class="font-semibold">TOKEN PLN ${product.nominal.toLocaleString('id-ID')}</span></div>
+            <div class="flex justify-between pt-2 border-t mt-2 dark:border-gray-600">
+                <span class="font-medium">Harga</span>
+                <span class="font-bold text-lg text-primary">Rp ${product.price.toLocaleString('id-ID')}</span>
+            </div>
+        </div>`;
+
+    showPurchaseModal({
+        title: 'Rincian Token Listrik',
+        contentHTML: contentHTML,
+        onConfirm: () => {
+            const purchaseDetails = { type: 'Token Listrik', name: `Token PLN ${product.nominal.toLocaleString('id-ID')}`, price: product.price, customerId: idpelValue };
+            setTimeout(() => renderPaymentConfirmation(purchaseDetails), 100);
+        }
+    });
+}
+
+// --- FUNGSI FITUR VOUCHER GAME ---
+function renderVoucherGameTab(container) {
+    container.innerHTML = `
+        <div class="form-section !pt-0">
+            <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">Pilih Game</h3>
+            <div class="grid grid-cols-4 gap-4">${PRODUCTS.voucherGame.map(game => `
+                <div class="flex flex-col items-center space-y-2 cursor-pointer text-center" onclick="renderGameProductList('${game.id}')">
+                    <img src="${game.logo}" alt="${game.name}" class="w-16 h-16 object-cover rounded-xl shadow-md bg-gray-200">
+                    <p class="text-xs font-semibold h-8">${game.name}</p>
+                </div>`).join('')}
+            </div>
+        </div>`;
+}
+
+function renderGameProductList(gameId) {
+    const contentContainer = document.getElementById('pulsa-content');
+    const gameData = PRODUCTS.voucherGame.find(g => g.id === gameId);
+    if (!gameData) return;
+    const zoneIdInputHTML = gameData.needsZoneId ? `<input type="number" id="gameZoneId" class="modern-input w-full" placeholder="Zone ID">` : '';
+    const userIdPlaceholder = gameId === 'garena_undawn' ? 'Masukkan OpenID' : 'Masukkan User ID';
+
+    contentContainer.innerHTML = `
+        <div class="space-y-6">
+            <div><button class="font-semibold text-blue-600 flex items-center gap-2" onclick="switchPulsaTab('voucher-game', document.querySelector('[onclick*=\\'voucher-game\\']'))"><i class="fas fa-arrow-left"></i><span>Kembali</span></button></div>
+            <div class="form-section !p-4 !m-0">
+                <p class="font-semibold mb-2 text-sm text-gray-600 dark:text-gray-300">Lengkapi Data ${gameData.name}</p>
+                <div class="grid ${gameData.needsZoneId ? 'grid-cols-2' : 'grid-cols-1'} gap-2">
+                    <input type="number" id="gameUserId" class="modern-input w-full" placeholder="${userIdPlaceholder}">
+                    ${zoneIdInputHTML}
+                </div>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">Pilih Nominal</h3>
+                <div class="grid grid-cols-2 gap-3">${gameData.products.map((prod, index) => `
+                    <div class="product-card !p-3 cursor-pointer" onclick='showGameRincianModal("${gameId}", ${index})'>
+                        <p class="font-semibold text-sm">${prod.name}</p>
+                        <p class="text-blue-600 font-bold mt-2">Rp ${prod.price.toLocaleString('id-ID')}</p>
+                    </div>`).join('')}
+                </div>
+            </div>
+        </div>`;
+}
+
+function showGameRincianModal(gameId, productIndex) {
+    const userId = document.getElementById('gameUserId').value;
+    const gameData = PRODUCTS.voucherGame.find(g => g.id === gameId);
+    const idName = gameId === 'garena_undawn' ? 'OpenID' : 'User ID';
+    if (!userId) {
+        showNotification(`Harap masukkan ${idName}.`);
+        return;
+    }
+    let zoneId = null;
+    if (gameData.needsZoneId) {
+        zoneId = document.getElementById('gameZoneId').value;
+        if (!zoneId) {
+            showNotification('Harap masukkan Zone ID.');
+            return;
+        }
+    }
+    const product = gameData.products[productIndex];
+    const customerId = zoneId ? `${userId} (${zoneId})` : userId;
+
+    const contentHTML = `
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span>Game</span><span class="font-semibold">${gameData.name}</span></div>
+            <div class="flex justify-between"><span>${idName}</span><span class="font-semibold">${customerId}</span></div>
+            <div class="flex justify-between"><span>Produk</span><span class="font-semibold">${product.name}</span></div>
+            <div class="flex justify-between pt-2 border-t mt-2 dark:border-gray-600">
+                <span class="font-medium">Harga</span>
+                <span class="font-bold text-lg text-primary">Rp ${product.price.toLocaleString('id-ID')}</span>
+            </div>
+        </div>`;
+
+    showPurchaseModal({
+        title: 'Rincian Voucher Game',
+        contentHTML: contentHTML,
+        onConfirm: () => {
+            const purchaseDetails = { type: 'Voucher Game', name: `${gameData.name} - ${product.name}`, price: product.price, customerId: customerId };
+            setTimeout(() => renderPaymentConfirmation(purchaseDetails), 100);
+        }
+    });
+}
+
+// --- FUNGSI FITUR E-WALLET ---
+function renderEwalletTab(container) {
+    container.innerHTML = `
+        <div class="form-section !pt-0">
+            <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">Pilih E-Wallet</h3>
+            <div class="grid grid-cols-4 gap-4">${PRODUCTS.eWallet.map(wallet => `
+                <div class="flex flex-col items-center space-y-2 cursor-pointer text-center" onclick="renderEwalletProductList('${wallet.id}')">
+                    <img src="${wallet.logo}" alt="${wallet.name}" class="w-16 h-16 object-contain rounded-xl shadow-md bg-white p-1">
+                    <p class="text-xs font-semibold h-8">${wallet.name}</p>
+                </div>`).join('')}
+            </div>
+        </div>`;
+}
+
+function renderEwalletProductList(ewalletId) {
+    const contentContainer = document.getElementById('pulsa-content');
+    const ewalletData = PRODUCTS.eWallet.find(w => w.id === ewalletId);
+    if (!ewalletData) return;
+
+    contentContainer.innerHTML = `
+        <div class="space-y-6">
+            <div><button class="font-semibold text-blue-600 flex items-center gap-2" onclick="switchPulsaTab('e-wallet', document.querySelector('[onclick*=\\'e-wallet\\']'))"><i class="fas fa-arrow-left"></i><span>Kembali</span></button></div>
+            <div class="form-section !p-4 !m-0">
+                <label class="block text-sm font-medium text-muted mb-1">Nomor HP E-Wallet</label>
+                <div class="relative">
+                     <div class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center pointer-events-none"><img src="${ewalletData.logo}" class="w-7 h-7 object-contain"></div>
+                    <input type="tel" id="ewallet-phone-number" class="modern-input !pl-12" placeholder="Masukkan nomor tujuan">
+                </div>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">Pilih Nominal Top Up</h3>
+                <div class="grid grid-cols-2 gap-3">${ewalletData.products.map((prod, index) => `
+                    <div class="product-card !p-3 cursor-pointer" onclick='showEwalletRincianModal("${ewalletId}", ${index})'>
+                        <p class="font-semibold text-sm">Rp ${prod.nominal.toLocaleString('id-ID')}</p>
+                        <p class="text-blue-600 font-bold mt-2">Rp ${prod.price.toLocaleString('id-ID')}</p>
+                    </div>`).join('')}
+                </div>
+            </div>
+        </div>`;
+}
+
+function showEwalletRincianModal(ewalletId, productIndex) {
+    const phoneNumber = document.getElementById('ewallet-phone-number').value;
+    if (!phoneNumber || phoneNumber.length < 8) {
+        showNotification('Harap isi Nomor HP E-Wallet yang valid.');
+        return;
+    }
+    const ewalletData = PRODUCTS.eWallet.find(w => w.id === ewalletId);
+    const product = ewalletData.products[productIndex];
+    const contentHTML = `
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span>E-Wallet</span><span class="font-semibold">${ewalletData.name}</span></div>
+            <div class="flex justify-between"><span>Nomor Tujuan</span><span class="font-semibold">${phoneNumber}</span></div>
+            <div class="flex justify-between"><span>Nominal Top Up</span><span class="font-semibold">Rp ${product.nominal.toLocaleString('id-ID')}</span></div>
+            <div class="flex justify-between pt-2 border-t mt-2 dark:border-gray-600">
+                <span class="font-medium">Total Harga</span>
+                <span class="font-bold text-lg text-primary">Rp ${product.price.toLocaleString('id-ID')}</span>
+            </div>
+        </div>`;
+    showPurchaseModal({
+        title: `Rincian Top Up ${ewalletData.name}`,
+        contentHTML: contentHTML,
+        onConfirm: () => {
+            const purchaseDetails = { 
+                type: `E-Wallet`, 
+                name: `Top Up ${ewalletData.name} ${product.nominal.toLocaleString('id-ID')}`, 
+                price: product.price, 
+                customerId: phoneNumber 
+            };
+            setTimeout(() => renderPaymentConfirmation(purchaseDetails), 100);
+        }
+    });
+}
+
+// --- FUNGSI MODAL & PEMBAYARAN ---
+function showPurchaseModal(options) {
+    const modalId = 'purchaseConfirmationModal';
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) {
+        existingModal.remove();
+    }
+    const modalHTML = `
+        <div id="${modalId}" class="modal-wrapper hidden">
+            <div class="modal-overlay" onclick="closePurchaseModal()"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="text-lg font-bold">${options.title || 'Konfirmasi'}</h3>
+                    <button class="modal-close-btn" onclick="closePurchaseModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body space-y-4">
+                    ${options.contentHTML || ''}
+                </div>
+                <div class="modal-footer grid grid-cols-2 gap-3">
+                    <button class="btn-secondary" onclick="closePurchaseModal()">Batal</button>
+                    <button id="confirm-purchase-btn" class="btn-primary">Lanjutkan</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    const modal = document.getElementById(modalId);
+    const confirmBtn = document.getElementById('confirm-purchase-btn');
+    if (confirmBtn && typeof options.onConfirm === 'function') {
+        confirmBtn.onclick = () => {
+            options.onConfirm();
+            closePurchaseModal();
+        };
+    }
+    setTimeout(() => modal.classList.remove('hidden'), 10);
+    setTimeout(() => modal.classList.add('active'), 20);
+}
+
+function closePurchaseModal() {
+    const modalId = 'purchaseConfirmationModal';
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.remove('active');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.remove();
+    }, 300);
+}
+
+function renderPaymentConfirmation(purchaseDetails) {
+    const mainContent = document.querySelector('.main-content');
+    if(!mainContent) return;
+    const transactionId = `INV/${new Date().getTime()}`;
+    const timestamp = new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
+    
+    const header = document.querySelector('#header');
+    const bottomNav = document.querySelector('.bottom-nav');
+    if (header) header.style.display = 'none';
+    if (bottomNav) bottomNav.style.display = 'none';
+    
+    mainContent.innerHTML = `
+        <section id="payment-success" class="content-section" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <div class="text-center pt-8">
+                <div class="w-24 h-24 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-check-circle text-5xl text-green-500"></i>
+                </div>
+                <h2 class="text-2xl font-bold mt-6">Pembayaran Berhasil</h2>
+                <p class="text-muted mt-2">Terima kasih! Transaksi Anda telah berhasil diproses.</p>
+            </div>
+            <div class="form-section mt-8">
+                <h3 class="font-bold text-lg mb-4">Detail Transaksi</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between"><span class="text-muted">Jenis Transaksi</span><span class="font-semibold">${purchaseDetails.type}</span></div>
+                    <div class="flex justify-between"><span class="text-muted">Produk</span><span class="font-semibold text-right">${purchaseDetails.name}</span></div>
+                    <div class="flex justify-between"><span class="text-muted">Nomor Tujuan / ID</span><span class="font-semibold">${purchaseDetails.customerId}</span></div>
+                    <hr class="dark:border-gray-700">
+                    <div class="flex justify-between items-center"><span class="text-muted">Total Bayar</span><span class="font-bold text-blue-600 text-xl">Rp ${purchaseDetails.price.toLocaleString('id-ID')}</span></div>
+                    <hr class="dark:border-gray-700">
+                    <div class="flex justify-between"><span class="text-muted">No. Invoice</span><span class="font-mono text-xs">${transactionId}</span></div>
+                    <div class="flex justify-between"><span class="text-muted">Waktu</span><span class="font-mono text-xs">${timestamp}</span></div>
+                </div>
+            </div>
+            <div class="mt-8 space-y-3">
+                <button class="btn-secondary w-full" onclick="showNotification('Fitur Bukti Transaksi segera hadir!')">Unduh Bukti Transaksi</button>
+                <button class="btn-primary w-full" onclick="window.location.reload()">Kembali ke Home</button>
+            </div>
+        </section>
+    `;
+}
